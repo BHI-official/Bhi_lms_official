@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { requireStudentStage } from "@/lib/auth";
 import { canEdit, editableSections, enrollmentState, nextStepPath, openCorrection } from "@/lib/enrollment";
-import { bodyOf, getTemplate } from "@/lib/forms/templates";
+import { clientFields, bodyOf, getTemplate } from "@/lib/forms/templates";
 import { prefillValues, templateContext } from "@/lib/forms/context";
 import { FormBody } from "@/components/form-body";
 import { StudentShell } from "@/components/student-shell";
@@ -43,7 +43,7 @@ export default async function FormPage({ params }: { params: Promise<{ key: stri
         <FormBody paragraphs={bodyOf(template, ctx)} />
         <FormStep
           action={saveFormAction.bind(null, template.key)}
-          fields={template.fields}
+          fields={clientFields(template)}
           values={prefillValues(template, application, user)}
           locked={locked}
           requiresSignature={template.requiresSignature}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
 import { requireAdmin } from "@/lib/auth";
-import { bodyOf, getTemplate } from "@/lib/forms/templates";
+import { clientFields, bodyOf, getTemplate } from "@/lib/forms/templates";
 import { templateContext } from "@/lib/forms/context";
 import { FormBody } from "@/components/form-body";
 import { audit } from "@/lib/audit";
@@ -30,7 +30,7 @@ export default async function AdminEditForm({ params }: { params: Promise<{ id: 
       {app.signatures?.[key] && <div className="mb-5"><Alert tone="warning">The student signed this form. Their signature stays on record, and the form will show that an admin edited it after signing.</Alert></div>}
       <Card>
         <FormBody paragraphs={bodyOf(template, ctx)} />
-        <FormStep action={adminSaveFormAction.bind(null, id, key)} fields={template.fields} values={app.forms?.[key]?.data ?? {}}
+        <FormStep action={adminSaveFormAction.bind(null, id, key)} fields={clientFields(template)} values={app.forms?.[key]?.data ?? {}}
           locked={false} requiresSignature={false} signature={null} defaultName="" adminMode />
       </Card>
     </>

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ActionState } from "@/lib/action";
-import type { Field as FieldDef } from "@/lib/forms/templates";
+import type { ClientField as FieldDef } from "@/lib/forms/templates";
 import { ActionForm, CheckGroup, Checkbox, Field, RadioGroup, Submit } from "@/components/forms";
 import { SignaturePad } from "@/components/signature-pad";
 

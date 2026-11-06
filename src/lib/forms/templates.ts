@@ -77,6 +77,14 @@ export type FormTemplate = {
   /** Rules across fields, e.g. "explain" is required when a question is answered Yes. Returns field errors. */
   check?: (data: Record<string, unknown>) => Record<string, string>;
 };
+/**
+ * A field as the browser gets it. `requiredIf` is a function, which can't be sent from a server page
+ * to a client component (doing so crashes the page), so it stays on the server, where answers are
+ * checked; the browser only needs the wording, options and hint text.
+ */
+export type ClientField = Omit<Field, "requiredIf">;
+export const clientFields = (t: FormTemplate): ClientField[] =>
+  t.fields.map(({ requiredIf: _serverOnly, ...f }) => f);
 
 /** Fields that hold an answer (headings and notes don't). */
 export const isInput = (f: Field) => f.type !== "heading" && f.type !== "note";
