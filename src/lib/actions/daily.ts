@@ -20,7 +20,7 @@ import type { ActionState } from "@/lib/action";
  * holiday and excused days always count zero hours and no times.
  *
  * Every student on the roster for that date can be marked, including students who have since moved
- * or left (their mark goes on the enrollment they had that day). EQISS students' biweekly reports are
+ * or left (their mark goes on the enrollment they had that day). Equus students' biweekly reports are
  * updated in the same step, so the report and the daily record never disagree.
  */
 export async function saveDayAction(classId: string, _: ActionState, fd: FormData): Promise<ActionState> {

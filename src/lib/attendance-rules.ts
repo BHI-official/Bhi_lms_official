@@ -50,7 +50,7 @@ export const ATTENDANCE_STATUSES = ["PRESENT", "LATE", "ABSENT", "SICK", "HOLIDA
 /** Statuses where the student attended (times and hours apply). Every other status counts zero hours. */
 export const attended = (s: string | undefined) => s === "PRESENT" || s === "LATE";
 
-/** The EQISS biweekly code for a day's status: absent and excused → A, holiday → H, sick → S; attended → none. */
+/** The Equus biweekly code for a day's status: absent and excused → A, holiday → H, sick → S; attended → none. */
 export function biweeklyCodeFor(status: string | undefined): "" | "A" | "H" | "S" {
   if (status === "ABSENT" || status === "EXCUSED") return "A";
   if (status === "HOLIDAY") return "H";
@@ -58,6 +58,6 @@ export function biweeklyCodeFor(status: string | undefined): "" | "A" | "H" | "S
   return "";
 }
 
-/** The day status for an EQISS biweekly code (the reverse of biweeklyCodeFor). */
+/** The day status for an Equus biweekly code (the reverse of biweeklyCodeFor). */
 export const statusForBiweeklyCode = (code: string): "ABSENT" | "HOLIDAY" | "SICK" | null =>
   code === "A" ? "ABSENT" : code === "H" ? "HOLIDAY" : code === "S" ? "SICK" : null;

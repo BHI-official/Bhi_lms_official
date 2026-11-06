@@ -11,7 +11,8 @@ import type { Category, County, CourseFees, EnrollmentType, NonPrivateProgram } 
  *     4. Emergency Medical Statement
  *   (The Laptop Receipt Confirmation is signed in person when the laptop is collected, not online.)
  *   Private Forms:      Private Enrollment Agreement (page 1, page 2), Tuition Refund Schedule
- *   Non-Private Forms:  Non-Private Enrollment Agreement
+ *   Non-Private Forms:  Personal Information (DFS only), Enrollment Agreement
+ *   DFS students sign the HCDFS Photo Release (photo_release_dfs) instead of the BHI one.
  *
  * OFFICIAL WORDING: the photographed packets were not committed to this repository. Each template has
  * a `body` (paragraphs shown above the fields, exactly as printed) and `pendingOfficialText: true`
@@ -86,13 +87,13 @@ export function displayValue(f: Field, v: unknown, opts: { revealSsn?: boolean }
 // ---------- Enrollment choices ----------
 
 export const ENROLLMENT_TYPE_LABELS: Record<EnrollmentType, string> = { PRIVATE: "Private", NON_PRIVATE: "Non-Private" };
-export const PROGRAM_LABELS: Record<NonPrivateProgram, string> = { EQISS: "EQISS / One-Stop", DFS: "DFS (Department of Family Services)" };
+export const PROGRAM_LABELS: Record<NonPrivateProgram, string> = { EQISS: "Equus / One-Stop", DFS: "DFS (Department of Family Services)" };
 export const COUNTY_LABELS: Record<County, string> = { HUDSON: "Hudson County", BERGEN: "Bergen County", SOMERSET: "Somerset County" };
 export const COUNTIES: County[] = ["HUDSON", "BERGEN", "SOMERSET"];
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   PRIVATE: "Private",
-  EQISS: "Non-Private: EQISS / One-Stop",
+  EQISS: "Non-Private: Equus / One-Stop",
   DFS: "Non-Private: DFS",
 };
 export const CATEGORIES: Category[] = ["PRIVATE", "EQISS", "DFS"];
@@ -107,13 +108,13 @@ export function categoryFor(type: EnrollmentType | null | undefined, program: No
   return null;
 }
 
-/** One-line description, e.g. "Non-Private: EQISS / One-Stop, Bergen County". */
+/** One-line description, e.g. "Non-Private: Equus / One-Stop, Bergen County". */
 export function describeEnrollment(a: { category: Category | null; county?: County | null }): string {
   if (!a.category) return "Not selected";
   return a.category === "EQISS" && a.county ? `${CATEGORY_LABELS.EQISS}, ${COUNTY_LABELS[a.county]}` : CATEGORY_LABELS[a.category];
 }
 
-/** Which attendance sheet a track uses: EQISS = shared biweekly ITA report; DFS and Private = monthly handwritten sheet. */
+/** Which attendance sheet a track uses: Equus / One-Stop (code EQISS) = shared biweekly ITA report; DFS and Private = monthly handwritten sheet. */
 export type AttendanceFormat = "BIWEEKLY" | "MONTHLY";
 export const attendanceFormatFor = (c: Category | null | undefined): AttendanceFormat => (c === "EQISS" ? "BIWEEKLY" : "MONTHLY");
 
@@ -123,7 +124,12 @@ export const attendanceFormatFor = (c: Category | null | undefined): AttendanceF
 // the school's or the student's name, the name is filled in.
 
 const YES_NO = ["Yes", "No"];
-const SIGN_DATE_NOTE = "Your signature and today's date are recorded when you sign below.";
+export const RACES = [
+  "American Indian or Alaska Native", "White", "Asian", "Black or African American", "Hispanic or Latino",
+  "Native Hawaiian or Other Pacific Islander", "More Than One Race",
+];
+export const SIGNER_ROLES = ["Student (18 or older)", "Parent", "Guardian"];
+export const SIGN_DATE_NOTE = "Your signature and today's date are recorded when you sign below.";
 const QUESTIONS: Field = { name: "questionsComments", label: "Questions or comments (on paper: \"please write any questions or comments you have on the back of this sheet\")", type: "textarea", maxLength: 2000 };
 
 /** "Explain" becomes required when any of the listed questions is answered Yes. */
@@ -356,7 +362,7 @@ export const TEMPLATES: FormTemplate[] = [
     fields: [{ name: "studentName", label: "Name of the Student", type: "text", required: true, maxLength: 120, prefill: "name" }],
   },
   {
-    key: "photo_release", title: "Photo Release Form", version: 2, group: "COMMON", appliesTo: "ALL",
+    key: "photo_release", title: "Photo Release Form", version: 2, group: "COMMON", appliesTo: ["PRIVATE", "EQISS"],
     containsFees: false, requiresSignature: true, pendingOfficialText: false,
     body: (ctx) => [
       "Bright Horizon Institute · 910 Bergen Ave Floor 3 Jersey City, New Jersey 07306 · PH: 201-377-1594",
@@ -368,6 +374,24 @@ export const TEMPLATES: FormTemplate[] = [
     fields: [
       { name: "studentName", label: "Student Name:", type: "text", required: true, maxLength: 120, prefill: "name" },
       { name: "photoRelease", label: "Photo release", type: "radio", required: true, options: ["I give permission", "I do not give permission"] },
+    ],
+  },
+
+  {
+    // The HCDFS packet's Photo Release (BHI's new design). Same place in the packet as the BHI one above.
+    key: "photo_release_dfs", title: "Photo Release Form", version: 1, group: "COMMON", appliesTo: ["DFS"],
+    containsFees: false, requiresSignature: true, pendingOfficialText: false,
+    body: [
+      "I hereby grant the Bright Horizon Institute LLC. permission to use my likeness in a photograph, video, or other digital media (\u201cphoto\u201d) in any of its publications, including web-based publications, without payment or other consideration.",
+      "I understand and agree that all photos will become the property of the Bright Horizon Institute and will not be returned.",
+      "I irrevocably authorize the Bright Horizon Institute LLC. to edit, alter, copy, exhibit, publish, or distribute these photos for any lawful purpose. In addition, I waive any right to inspect or approve the finished product wherein my likeness appears. Additionally, I waive any right to royalties or other compensation arising or related to the use of the photo.",
+      "I hereby hold harmless, release, and forever discharge the Bright Horizon Institute LLC. from all claims, demands, and causes of action which I, my heirs, representatives, executors, administrators, or any other persons acting on my behalf or on behalf of my estate have or may have because of this authorization.",
+      "I HAVE READ AND UNDERSTAND THE ABOVE PHOTO RELEASE. I AFFIRM THAT I AM AT LEAST 18 YEARS OF AGE, OR, IF I AM UNDER 18 YEARS OF AGE, I HAVE OBTAINED THE REQUIRED CONSENT OF MY PARENTS/GUARDIANS AS EVIDENCED BY THEIR SIGNATURES BELOW. I ACCEPT:",
+    ],
+    fields: [
+      { name: "photoRelease", label: "Photo release", type: "radio", required: true, options: ["I give permission", "I do not give permission"] },
+      { name: "signerRole", label: "Who is signing below? (If you are under 18, a parent or guardian signs.)", type: "radio", required: true, options: SIGNER_ROLES },
+      { name: "signerName", label: "Print Full Name (of the person signing)", type: "text", required: true, maxLength: 120, prefill: "name" },
     ],
   },
 
@@ -419,9 +443,55 @@ export const TEMPLATES: FormTemplate[] = [
 
   // ----- Non-Private Forms -----
   {
-    key: "nonprivate_agreement", title: "Non-Private Enrollment Agreement", version: 1, group: "NON_PRIVATE", appliesTo: ["EQISS", "DFS"],
-    containsFees: false, requiresSignature: true, pendingOfficialText: true,
-    fields: [{ name: "acknowledged", label: "I have read the Non-Private Enrollment Agreement and agree to its terms.", type: "checkbox", required: true }],
+    // Wording and layout from the HCDFS enrollment packet (BHI's new design), October 2026.
+    key: "personal_information", title: "Personal Information", version: 1, group: "NON_PRIVATE", appliesTo: ["DFS"],
+    containsFees: false, requiresSignature: false, pendingOfficialText: false,
+    fields: [
+      { name: "firstName", label: "First Name", type: "text", required: true, maxLength: 80, prefill: "background_check.firstName" },
+      { name: "lastName", label: "Last Name", type: "text", required: true, maxLength: 80, prefill: "background_check.lastName" },
+      { name: "ssn", label: "Social Security Number (SSN)", type: "ssn", required: true, prefill: "student_data.ssn" },
+      { name: "dateOfBirth", label: "Student Date of Birth (DOB)", type: "date", required: true, prefill: "student_data.dateOfBirth" },
+      { name: "gender", label: "Gender", type: "radio", required: true, options: ["Male", "Female", "Non-Binary"], prefill: "workforce_registration.gender" },
+      { name: "address1", label: "Student Address 1", type: "text", required: true, maxLength: 160, prefill: "student_data.street" },
+      { name: "address2", label: "Student Address 2", type: "text", maxLength: 160 },
+      { name: "city", label: "Student City", type: "text", required: true, maxLength: 80, prefill: "student_data.city" },
+      { name: "state", label: "Student State", type: "text", required: true, maxLength: 40, prefill: "student_data.state" },
+      { name: "zip", label: "Student ZIP Code", type: "text", required: true, maxLength: 10, prefill: "student_data.zip" },
+      { name: "county", label: "Student County", type: "text", maxLength: 60, prefill: "workforce_registration.county" },
+      { name: "stateId", label: "Driver\u2019s License / State ID", type: "text", maxLength: 40 },
+      { name: "h_official", label: "Official Use Only", type: "heading" },
+      { name: "n_official", label: "Program, credential and dates are filled in by BHI from your enrollment. Please answer the questions below.", type: "note" },
+      { name: "ethnicity", label: "Student Ethnicity", type: "radio", required: true, options: ["Hispanic", "Non-Hispanic", "Do Not Want to Disclose"] },
+      { name: "race", label: "Student Race", type: "radio", required: true, options: RACES },
+      { name: "h_additional", label: "Additional Student Information", type: "heading" },
+      { name: "exhaustedTanf", label: "Exhausted TANF", type: "radio", required: true, options: ["Yes", "No", "Not Applicable"] },
+      { name: "disability", label: "Disability Status", type: "radio", required: true, options: ["Yes", "No", "Participant Did Not Self-Identify"] },
+      yn("englishLearner", "English Language Learner"),
+      yn("wioa", "WIOA Participant"),
+      yn("unhoused", "Unhoused"),
+      yn("fosterCare", "Foster Care Youth"),
+      yn("formerlyIncarcerated", "Formerly Incarcerated"),
+    ],
+  },
+  {
+    key: "nonprivate_agreement", title: "Enrollment Agreement", version: 2, group: "NON_PRIVATE", appliesTo: ["EQISS", "DFS"],
+    containsFees: false, requiresSignature: true, pendingOfficialText: false,
+    body: (ctx) => [
+      `I, ${ctx.studentName} (Name of Student), hereby seek enrollment for training leading to certification in ${ctx.course?.name ?? "________"} (Title of Program) at Bright Horizon Institute. I agree to comply with the school policy.`,
+      "Requirements for Graduation",
+      "In order to graduate the student must successfully complete all on-campus courses with a minimum grade average of 75% for each section, successfully complete the clinical externship, complete all affiliated institutional exit interviews and maintain an overall attendance of 80%.",
+      "Closures & Delay Notices",
+      "Occasionally, BHI experiences some nasty weather that makes it unsafe for students to travel to and from school. In these situations, we may cancel school or run on a two-hour delay. If one of these situations occurs, our phone messenger system will provide updated information and we will notify the students through email and phone.",
+      "In the event of an unannounced school closure, students enrolled at the time of the closure must contact the Department of Labor and Workforce Development\u2019s Training Evaluation Unit within ninety (90) calendar days of the closure. Failure to do so within ninety (90) days may exclude the student from any available form of assistance. The contact number to call is (609)-292-4287 or email at trainingevaluationunit@dol.nj.gov.",
+      "Employment Services",
+      "The school provides employment assistance to all graduated Bright Horizon Students. Finding employment is a joint effort between school and student. The student must agree to cooperate with the job placement/career services coordinator to maximize success for helping to find employment in the allied health or related field. The school cannot and does not promise or guarantee placement upon graduation. Employment is only attained by the applicant that truly seeks it.",
+      "The student agrees to comply with school rules and regulations during his/her program of study, and the school has the right to terminate the student\u2019s enrollment in the event of the student\u2019s failure to comply with the rules and regulations. A student\u2019s enrollment may also be terminated for failure to maintain a satisfactory grade point average, failure to meet school attendance requirements.",
+      "By signing below, I the undersigned enroll in the above program of training acknowledge having received, read and understood a copy of this Enrollment Agreement and the School Catalog and agree to comply with the terms of each. I further acknowledge that no oral representations regarding the percentage of graduates, employed or starting salaries have been made to me by any representative or employee of the school. This enrollment agreement may be cancelled within two days of signing. Any questions regarding terms of this Enrollment Agreement should be addressed to the appropriate school representative.",
+    ],
+    fields: [
+      { name: "studentName", label: "Name of Student", type: "text", required: true, maxLength: 120, prefill: "name" },
+      { name: "n_sign", label: SIGN_DATE_NOTE, type: "note" },
+    ],
   },
 ];
 

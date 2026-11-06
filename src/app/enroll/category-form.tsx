@@ -48,7 +48,7 @@ function Choices({ current }: { current: Current }) {
             <label className={card}>
               <span className="flex items-center gap-2 font-semibold">
                 <input type="radio" name="fundingProgram" value="EQISS" checked={program === "EQISS"} onChange={() => setProgram("EQISS")} className="accent-pine-700" />
-                EQISS / One-Stop
+                Equus / One-Stop
               </span>
             </label>
             <label className={card}>

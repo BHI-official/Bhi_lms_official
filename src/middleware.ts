@@ -26,7 +26,10 @@ export async function middleware(req: NextRequest) {
     }
   }
   if (!role) {
+    // Remember where they were going (e.g. the dashboard link in the approval email), so signing in
+    // takes them straight there instead of losing the link.
     const url = new URL("/login", req.url);
+    url.searchParams.set("next", path + req.nextUrl.search);
     return NextResponse.redirect(url);
   }
   if (!rule.roles.includes(role)) return NextResponse.redirect(new URL("/", req.url));

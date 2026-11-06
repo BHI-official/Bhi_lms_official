@@ -4,6 +4,8 @@ import { requireStudentStage } from "@/lib/auth";
 import { StudentShell } from "@/components/student-shell";
 import { Alert, Card, PageHeader, StatusBadge, fmtDate } from "@/components/ui";
 import { ActionButton } from "@/components/action-widgets";
+import { PdfActions } from "@/components/pdf-actions";
+import { printableForms } from "@/lib/pdf/forms/list";
 import { startCheckoutAction } from "@/lib/actions/payment";
 import { formatUsd } from "@/lib/payment";
 import { requestOpen, stripeEnabled } from "@/lib/tuition";
@@ -71,7 +73,20 @@ export default async function ApplicationStatusPage({ searchParams }: { searchPa
             <div><dt className="text-slate-500">Submitted</dt><dd className="font-medium">{fmtDate(application.submittedAt)}</dd></div>
             <div><dt className="text-slate-500">Email</dt><dd className="font-medium">{user.email}</dd></div>
           </dl>
-          <a href={`/api/pdf/application/${application._id}`} className="mt-5 inline-block text-sm font-semibold text-pine-700 underline">Download my application (PDF)</a>
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
+            <span className="font-medium text-slate-600">All my forms (PDF):</span>
+            <PdfActions href={`/api/pdf/application/${application._id}`} label="all my enrollment forms" />
+          </div>
+        </Card>
+        <Card title="My forms">
+          <ul className="divide-y divide-line text-sm">
+            {printableForms(application).map((t) => (
+              <li key={t.key} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                <span className="font-medium">{t.title}</span>
+                <PdfActions compact href={`/api/pdf/application/${application._id}/forms/${t.key}`} label={t.title} />
+              </li>
+            ))}
+          </ul>
         </Card>
       </div>
     </StudentShell>

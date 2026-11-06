@@ -3,7 +3,8 @@ import Link from "next/link";
 import { cols } from "@/db";
 import { requireAdmin } from "@/lib/auth";
 import { describeEnrollment, pendingTemplates } from "@/lib/forms/templates";
-import { eqissTextPending } from "@/lib/eqiss-text";
+import { equusTextPending } from "@/lib/equus-text";
+import { appUrlProblem } from "@/lib/app-url";
 import { Alert } from "@/components/ui";
 import { attendanceToDo, usersById } from "@/lib/queries";
 import { Card, Empty, PageHeader, Stat, StatusBadge, fmtDate } from "@/components/ui";
@@ -46,9 +47,11 @@ export default async function AdminDashboard() {
     { n: noFees, text: (n: number) => `${n} course${n === 1 ? " has" : "s have"} no Private tuition set`, href: "/admin/courses", button: "Set" },
   ].filter((t) => t.n > 0);
 
+  const linkProblem = appUrlProblem();
   return (
     <>
       <PageHeader title="Home" description="What needs your attention today." />
+      {linkProblem && <div className="mb-6"><Alert tone="warning"><p className="font-semibold">Email links may not open for students</p><p className="mt-1">{linkProblem}</p></Alert></div>}
       {courseCount === 0 && <div className="mb-6"><Alert tone="info">No courses yet. Ask your technical admin to load the BHI course list, or <Link href="/admin/courses" className="underline">add courses</Link> yourself.</Alert></div>}
       <Card title="To do">
         {todo.length === 0 ? <Empty>Nothing needs your attention right now.</Empty> : (
@@ -101,9 +104,9 @@ export default async function AdminDashboard() {
           )}
         </Card>
       </div>
-      {(pendingText.length > 0 || eqissTextPending()) && (
+      {(pendingText.length > 0 || equusTextPending()) && (
         <p className="mt-8 text-xs text-slate-500">
-          Still waiting for official wording from BHI: {[...pendingText.map((t) => t.title), ...(eqissTextPending() ? ["EQISS report declarations"] : [])].join(", ")}.
+          Still waiting for official wording from BHI: {[...pendingText.map((t) => t.title), ...(equusTextPending() ? ["Equus report declarations"] : [])].join(", ")}.
         </p>
       )}
     </>

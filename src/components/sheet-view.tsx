@@ -22,7 +22,7 @@ export async function loadEnrollmentFor(user: User, enrollmentId: string): Promi
 }
 
 /**
- * The right attendance sheet for a student: the shared EQISS biweekly report (Hudson, Bergen and
+ * The right attendance sheet for a student: the shared Equus biweekly report (Hudson, Bergen and
  * Somerset alike) or the DFS / Private monthly handwritten sheet. Access is checked by the caller's
  * loadEnrollmentFor (admin, an instructor of the course, or the student themself).
  */

@@ -125,7 +125,7 @@ export function dailyRecordsHash(records: Record<string, AttendanceRecord> | und
   }));
 }
 
-/** "Maria del Carmen Lopez" -> "ML". Used as the student's initials on the EQISS biweekly report when they fill out a day. */
+/** "Maria del Carmen Lopez" -> "ML". Used as the student's initials on the Equus biweekly report when they fill out a day. */
 export function initialsOf(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (!words.length) return "";

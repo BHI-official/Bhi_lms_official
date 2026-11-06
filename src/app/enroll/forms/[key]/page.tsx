@@ -8,6 +8,7 @@ import { StudentShell } from "@/components/student-shell";
 import { Alert, Card, PageHeader, fmtDate } from "@/components/ui";
 import { EnrollNav } from "../../enroll-nav";
 import { FormStep } from "./form-step";
+import { PdfActions } from "@/components/pdf-actions";
 import { saveFormAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +30,8 @@ export default async function FormPage({ params }: { params: Promise<{ key: stri
 
   return (
     <StudentShell name={user.name} step={1} nav={<EnrollNav app={application} active={key} />}>
-      <PageHeader title={template.title} />
+      <PageHeader title={template.title}
+        actions={application.forms?.[key] ? <span className="flex flex-wrap items-center gap-2 text-sm"><span className="font-medium text-slate-600">This form (PDF):</span><PdfActions href={`/api/pdf/application/${application._id}/forms/${key}`} label={template.title} /></span> : undefined} />
       {correction && !locked && (
         <div className="mb-5"><Alert tone="warning">
           <p className="font-semibold">Please update this form. Note from the admissions team:</p>

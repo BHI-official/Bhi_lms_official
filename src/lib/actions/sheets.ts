@@ -47,7 +47,7 @@ export async function saveDailyEntryAction(enrollmentId: string, date: string, _
   const e = await visible(user, enrollmentId);
   if (!e) return NO_ACCESS;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "Invalid date." };
-  if ((await sheetFormatFor(e.studentId)) !== "MONTHLY") return { error: "This student uses the EQISS biweekly report." };
+  if ((await sheetFormatFor(e.studentId)) !== "MONTHLY") return { error: "This student uses the Equus biweekly report." };
   const { classes, classSessions } = await cols();
   const klass = await classes.findOne({ _id: e.classId });
   if (!klass) return { error: "Class not found." };
@@ -162,7 +162,7 @@ export async function signMyMonthAction(enrollmentId: string, month: string, _: 
   return { ok: true, message: `Signed ${days.length} day${days.length === 1 ? "" : "s"}. Thank you.` };
 }
 
-// ---------- EQISS / One-Stop biweekly ITA report ----------
+// ---------- Equus / One-Stop biweekly ITA report ----------
 
 async function loadSheetFor(user: User, sheetId: string) {
   if (!uuid.safeParse(sheetId).success) return null;

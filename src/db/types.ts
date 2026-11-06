@@ -3,7 +3,7 @@ export type InstructorStatus = "PENDING" | "APPROVED" | "REJECTED";
 export type OtpPurpose = "VERIFY_EMAIL" | "RESET_PASSWORD";
 /**
  * Funding track. Derived from the student's choices and used to pick forms and the attendance sheet:
- * PRIVATE (self-paying), EQISS (Non-Private, EQISS / One-Stop) or DFS (Non-Private, Department of Family Services).
+ * PRIVATE (self-paying), EQISS (Non-Private, Equus / One-Stop) or DFS (Non-Private, Department of Family Services).
  * Enrollment type, funding program and county are stored separately on the application as well.
  */
 export type Category = "PRIVATE" | "EQISS" | "DFS";
@@ -358,7 +358,7 @@ export type BiweeklyHeader = {
 };
 export type BiweeklyStatus = "OPEN" | "CUSTOMER_SIGNED" | "COMPLETED";
 /**
- * EQISS / One-Stop "Customer Instructional Time, Attendance & Progress Biweekly Report — ITA Contract".
+ * Equus / One-Stop "Customer Instructional Time, Attendance & Progress Biweekly Report — ITA Contract".
  * Same document for Hudson, Bergen and Somerset counties. One per enrollment and two-week period.
  */
 export type BiweeklyTimesheet = {

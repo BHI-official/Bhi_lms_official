@@ -82,7 +82,7 @@ const STEPS: Step[] = [
     actions: [
       "Open a course and add a new class.",
       "Give it a clear class code.",
-      "Choose its funding program: Private, EQISS, DFS, or Mixed.",
+      "Choose its funding program: Private, Equus / One-Stop, DFS, or Mixed.",
       "Save it.",
     ],
     done: "Each course has at least one class with the right funding program.",
@@ -131,7 +131,7 @@ const STEPS: Step[] = [
       "After approving, place the student in a class from the class page.",
     ],
     done: "The application is no longer waiting, and approved students appear in a class.",
-    tip: "Private students: record tuition as Paid or Waived before approving. Funded students (EQISS, DFS) never get a payment status.",
+    tip: "Private students: record tuition as Paid or Waived before approving. Funded students (Equus / One-Stop, DFS) never get a payment status.",
     route: "applications",
     routeLabel: "Open applications",
   },
@@ -160,7 +160,7 @@ const CHECKS = [
   },
   {
     where: "Attendance sheets",
-    tells: "Monthly sheets for DFS and Private students. Biweekly report for EQISS and One-Stop.",
+    tells: "Monthly sheets for DFS and Private students. Biweekly report for Equus / One-Stop.",
     often: "Weekly",
   },
   {

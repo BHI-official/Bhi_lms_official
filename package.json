@@ -9,12 +9,13 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:seed": "tsx scripts/seed.ts",
-    "test": "tsx --test tests/unit.test.ts",
+    "test": "tsx --test tests/unit.test.ts tests/forms-pdf.test.ts",
     "test:e2e": "node tests/e2e.mjs",
     "db:setup": "tsx scripts/setup-db.ts",
     "test:regressions": "node tests/regressions.mjs",
     "db:migrate": "tsx scripts/migrate-2026-10.ts",
-    "db:courses": "tsx scripts/seed-courses.ts"
+    "db:courses": "tsx scripts/seed-courses.ts",
+    "forms:samples": "tsx --conditions react-server scripts/render-form-samples.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -15,8 +15,8 @@ Use a staging site with Stripe **test** keys and real email. Tick each line. Str
 - [ ] Fill in all 7 Common and 3 Private forms. The Enrollment Agreement shows your name, course and fees. Answer "Yes" to an arrest question without explaining: you are asked to explain.
 - [ ] Upload a resume and photo ID, then Review and submit.
 
-## C. EQISS and DFS students
-- [ ] EQISS: choose a county. No prices anywhere, no payment step, and only the Non-Private agreement after the Common forms.
+## C. Equus and DFS students
+- [ ] Equus / One-Stop: choose a county. No prices anywhere, no payment step, and only the Non-Private agreement after the Common forms.
 - [ ] DFS: same check.
 
 ## D. Admin review
@@ -29,7 +29,7 @@ Use a staging site with Stripe **test** keys and real email. Tick each line. Str
 - [ ] As admin, open the class and set class times in Class settings: start 9:00, end 15:00, lunch 12:00–12:30.
 - [ ] Daily attendance: mark one student Present (keep the times), one Late (time in 9:40), one Sick. Save. Hours are 5.5, 4.83 and 0.
 - [ ] Sign the day.
-- [ ] As the EQISS student, open the biweekly report. Today shows the times (or "S" for sick). Initials are empty for the student to fill.
+- [ ] As the Equus student, open the biweekly report. Today shows the times (or "S" for sick). Initials are empty for the student to fill.
 - [ ] As instructor, change a day on the biweekly report to "H". The daily attendance for that day now shows Holiday.
 - [ ] As the DFS or Private student, open the monthly sheet and sign. The signed days show your signature.
 - [ ] Move the student to another class. Their earlier attendance stays under "Earlier classes", and the class page shows instructor history.
@@ -40,5 +40,11 @@ Use a staging site with Stripe **test** keys and real email. Tick each line. Str
 - [ ] As an instructor, open a class you don't teach by changing the link. You get "not found".
 
 ## G. PDFs
-- [ ] Download the application PDF (Private and EQISS) and compare it with the paper forms. The EQISS PDF has no fee forms.
+- [ ] Download the application PDF (Private and Equus) and compare it with the paper forms. The Equus PDF has no fee forms.
 - [ ] Download a monthly sheet, a biweekly report and a progress report PDF.
+
+## After every deployment: approval link
+- [ ] On the server, `APP_URL` is the public HTTPS address students use (e.g. `https://lms.brighthorizoninstitute.com`), with no trailing slash. The admin Home page shows a yellow "Email links may not open for students" box if it is missing or points at localhost / a private address.
+- [ ] Approve a test application. In the approval email, the "Open my dashboard" link starts with the public address (not `localhost`, `192.168…` or a machine name).
+- [ ] Open that link on a phone that is **not** on the office network, signed out: it shows Sign in; after signing in you land on the dashboard (not "Page not found").
+- [ ] Private student: pay with a Stripe test card; Stripe returns you to `/application/paid` on the public address.

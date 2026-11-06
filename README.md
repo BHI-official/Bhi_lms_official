@@ -5,7 +5,7 @@ Enrollment, approval, class assignment, attendance and monthly progress reports 
 **Workflows (October 2026 requirements):**
 
 - **Private:** register → verify email → Private → choose course → pay the course's tuition and fees online (Stripe) → Common Forms + Private Forms → resume and documents → submit → admin decision → enrolled in the chosen course → dashboard (monthly attendance sheet).
-- **EQISS / One-Stop:** register → Non-Private → EQISS + Hudson, Bergen or Somerset County → course → Common Forms + Non-Private Enrollment Agreement → resume and documents → submit → admin decision → enrolled → biweekly ITA report (same sheet for all three counties).
+- **Equus / One-Stop:** register → Non-Private → Equus / One-Stop + Hudson, Bergen or Somerset County → course → Common Forms + Non-Private Enrollment Agreement → resume and documents → submit → admin decision → enrolled → biweekly ITA report (same sheet for all three counties).
 - **DFS:** register → Non-Private → DFS → course → Common Forms + Non-Private Enrollment Agreement → resume and documents → submit → admin decision → enrolled → monthly handwritten attendance.
 - **Instructor:** sign up at `/register/instructor` (or be invited by an admin) → admin approves → admin assigns one or more courses → instructor sees those courses' students, each with an **Attendance Sheet** and a **Monthly Progress Report**.
 
@@ -43,7 +43,7 @@ npm run db:migrate -- --apply     # applies it (also creates the new indexes)
 npm run db:migrate -- --apply --course-assignments-from-sections
 ```
 
-The migration converts the old "Hudson County" category to Non-Private / EQISS / One-Stop / Hudson County, marks old "EQISS" applications as EQISS with no county (they are listed so an admin can set the county), renames the HUDSON_COUNTY funding program on courses and sections to EQISS, and fills in course ids. Nothing is deleted: answers to the earlier placeholder forms stay on each application and appear under "Answers from earlier form versions".
+The migration converts the old "Hudson County" category to Non-Private / Equus / One-Stop (code `EQISS`) / Hudson County, marks old "EQISS" applications as EQISS with no county (they are listed so an admin can set the county), renames the HUDSON_COUNTY funding program on courses and sections to EQISS, and fills in course ids. Nothing is deleted: answers to the earlier placeholder forms stay on each application and appear under "Answers from earlier form versions".
 ```
 
 Admins sign in with the printed one-time password, then use **Forgot password** to set their own (a code is emailed).
@@ -87,7 +87,7 @@ npm run test:e2e         # end-to-end against a running dev server (see header o
 npm run test:regressions # earlier audit loopholes; same setup as test:e2e
 ```
 
-The end-to-end suite (97 checks) drives the real server over HTTP through every workflow above: enrollment choices and county, course eligibility, fee privacy (including the generated PDF text), corrections and resubmission history, admin edits, approval and course enrollment, instructor sign-up/approval/course assignment, the EQISS biweekly report (14 days, codes, signatures, locking), the monthly handwritten sheet (times, signature, sign-off, change flags), progress reports, Private payment gating, section moves and merges, assignment changes, access control, and the handwritten-app integration. It expects a fresh database, an admin account, `ALLOW_CONSOLE_EMAIL=true`, `PRIVATE_TUITION_USD=4500`, `INTEGRATION_API_KEY`, `MONGODB_URI` and the server log at `LOG`.
+The end-to-end suite (97 checks) drives the real server over HTTP through every workflow above: enrollment choices and county, course eligibility, fee privacy (including the generated PDF text), corrections and resubmission history, admin edits, approval and course enrollment, instructor sign-up/approval/course assignment, the Equus biweekly report (14 days, codes, signatures, locking), the monthly handwritten sheet (times, signature, sign-off, change flags), progress reports, Private payment gating, section moves and merges, assignment changes, access control, and the handwritten-app integration. It expects a fresh database, an admin account, `ALLOW_CONSOLE_EMAIL=true`, `PRIVATE_TUITION_USD=4500`, `INTEGRATION_API_KEY`, `MONGODB_URI` and the server log at `LOG`.
 
 ## Where things live
 
@@ -96,15 +96,15 @@ The end-to-end suite (97 checks) drives the real server over HTTP through every 
 | Enrollment forms (Common, Private, Non-Private) and uploads | `src/lib/forms/templates.ts` |
 | Enrollment choice, payment gate, course eligibility | `src/lib/selection.ts`, `src/lib/payment.ts`, `src/lib/courses.ts`, `src/lib/enrollment.ts` |
 | Approval → course enrollment, section moves and merges | `src/lib/placement.ts` |
-| Attendance sheets (monthly handwritten, EQISS biweekly) | `src/lib/timesheet.ts` (rules), `src/lib/sheets.ts`, `src/lib/actions/sheets.ts`, `src/components/*sheet*` |
-| EQISS report wording | `src/lib/eqiss-text.ts` |
+| Attendance sheets (monthly handwritten, Equus biweekly) | `src/lib/timesheet.ts` (rules), `src/lib/sheets.ts`, `src/lib/actions/sheets.ts`, `src/components/*sheet*` |
+| Equus report wording | `src/lib/equus-text.ts` |
 | Monthly Student Progress Report | `src/lib/reports/template.ts` |
 | Data migration | `scripts/migrate-2026-10.ts` |
 | Status rules (who sees which screen) | `src/lib/routing.ts`, `src/lib/auth.ts`, `src/middleware.ts` |
 | Permissions (admin / instructor / student) | `src/lib/authz.ts` |
 | OTP, sessions, rate limits | `src/lib/otp.ts`, `src/lib/session.ts`, `src/lib/rate-limit.ts` |
 | Emails | `src/lib/email.ts` |
-| PDFs (packet, attendance sheet, report) | `src/lib/pdf/` |
+| PDFs: enrollment forms on BHI's originals (`assets/forms/`, `src/lib/pdf/forms/`; preview with `npm run forms:samples`), attendance sheet, report | `src/lib/pdf/` |
 | Database documents and connection | `src/db/types.ts`, `src/db/index.ts`, indexes in `scripts/indexes.ts` |
 | Student pages | `src/app/enroll`, `src/app/application`, `src/app/dashboard` |
 | Admin pages and actions | `src/app/admin` |
@@ -115,8 +115,8 @@ The end-to-end suite (97 checks) drives the real server over HTTP through every 
 
 The admin home page lists anything still outstanding at the bottom.
 
-1. **Non-Private Enrollment Agreement wording.** Every Common and Private form now has the official wording and fields from the October 2026 packets (`src/lib/forms/templates.ts`). Only `nonprivate_agreement` still has `pendingOfficialText: true`; paste its printed text into `body`, match the fields, set it to `false` and bump `version`.
-2. **EQISS certification statements:** paste the customer and instructor statements from "Equus Timesheet - Updated 2026.docx" into `src/lib/eqiss-text.ts`.
+1. **Scans of the remaining forms.** Every form now has its official wording (the Non-Private Enrollment Agreement came with the HCDFS packet). Educational Background, Background Check, Emergency Medical and the Private agreement/refund pages print in BHI's form design until BHI sends their scans; add each to `assets/forms/` and `src/lib/pdf/forms/originals.ts`.
+2. **Equus certification statements:** paste the customer and instructor statements from "Equus Timesheet - Updated 2026.docx" into `src/lib/equus-text.ts`.
 3. **Course list details to confirm** (`data/bhi-courses.json`): certifications for programs 9–15 are left empty because the certification column in the source has one extra entry (the likely correct values are in the file's `note`); the unlabeled line under GED; which enrollment types may choose each course (all are open to everyone until set); whether the $25 application and $100 registration fees are part of each Total.
 4. **Inter-Agency Referral / Status Change Form** and **Social Security card copy:** optional uploads until BHI confirms.
 
@@ -135,7 +135,7 @@ Each class has a **Daily attendance** screen (instructors: from their class; adm
 1. For each student, choose Present, Late, Absent, Sick, Holiday or Excused. Time in and time out start at the class times (Class settings) and can be changed; lunch is the class break and is taken off automatically. Hours are calculated, never typed. Absent, sick, holiday and excused days count zero hours.
 2. Save, then sign the day. An admin can sign on the instructor's behalf (e.g. a substitute taught).
 3. DFS and Private students see their monthly sheet and sign the days they attended on their own login. The instructor signs off the month.
-4. EQISS students' biweekly reports are filled from the same daily records (A = absent or excused, H = holiday, S = sick). Staff edits on the report update the daily records too, so the two never disagree. Students enter their own initials.
+4. Equus students' biweekly reports are filled from the same daily records (A = absent or excused, H = holiday, S = sick). Staff edits on the report update the daily records too, so the two never disagree. Students enter their own initials.
 
 **Optional check-in codes:** in Class settings, "Students check in with a code on their phone" (off by default). When on, the instructor shows a 6-digit code that works for 10 minutes; students enter it on their dashboard and press "Fill my attendance" at the end of class. A student is late when they check in more than the class's "late after" minutes past the class start time. Two students checking in from the same phone are flagged. The saved, signed daily sheet is always the official record.
 
@@ -158,7 +158,7 @@ Each change is a single atomic document update, so the app needs no multi-docume
 | `progress_reports` | One per student enrollment per month, with the instructor's signature and earlier versions |
 | `course_assignments` | Instructor ↔ course; removing one sets `removedAt` so history stays |
 | `attendance_signoffs` | Instructor sign-off of a DFS/Private monthly sheet, with earlier sign-offs |
-| `biweekly_timesheets` | EQISS / One-Stop biweekly ITA report, one per enrollment and two-week period |
+| `biweekly_timesheets` | Equus / One-Stop biweekly ITA report, one per enrollment and two-week period |
 | `sessions`, `otp_codes`, `rate_limits`, `audit_logs` | Sign-in sessions, email codes, rate limits, and the history of every admin action |
 
 Uploaded files themselves are stored on disk or object storage (see Deploying), not in MongoDB.

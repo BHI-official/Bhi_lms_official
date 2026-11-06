@@ -167,7 +167,7 @@ export function CourseForm({ action, values, submitLabel }: { action: Act; value
       <fieldset>
         <legend className="mb-2 text-sm font-medium">Who can choose this course <span className="font-normal text-slate-500">(none ticked = everyone)</span></legend>
         <div className="flex flex-wrap gap-3">
-          {[["PRIVATE", "Private"], ["EQISS", "Non-Private: EQISS / One-Stop"], ["DFS", "Non-Private: DFS"]].map(([v, l]) => (
+          {[["PRIVATE", "Private"], ["EQISS", "Non-Private: Equus / One-Stop"], ["DFS", "Non-Private: DFS"]].map(([v, l]) => (
             <label key={v} className="flex items-center gap-2 rounded-md border border-line px-3 py-2 text-sm">
               <input type="checkbox" name="fundingPrograms" value={v} defaultChecked={values?.fundingPrograms.includes(v)} className="accent-pine-700" /> {l}
             </label>
@@ -191,8 +191,9 @@ export function ClassForm({ action, values, submitLabel }: { action: Act; values
       <Field name="schedule" label="Schedule" defaultValue={values?.schedule} help="e.g. Mon-Thu 9:00-1:00" maxLength={200} />
       <Field name="location" label="Location or online" defaultValue={values?.location} maxLength={200} />
       <Field name="capacity" label="Capacity" type="number" required defaultValue={String(values?.capacity ?? 25)} />
-      <Field name="fundingProgram" label="Funding program" type="select" required options={["MIXED", "PRIVATE", "EQISS", "DFS"]} defaultValue={values?.fundingProgram ?? "MIXED"}
-        help="MIXED accepts every program. EQISS covers Hudson, Bergen and Somerset counties." />
+      <Field name="fundingProgram" label="Funding program" type="select" required options={["MIXED", "PRIVATE", "EQISS", "DFS"]}
+        optionLabels={{ MIXED: "Mixed (any program)", PRIVATE: "Private", EQISS: "Equus / One-Stop", DFS: "DFS" }} defaultValue={values?.fundingProgram ?? "MIXED"}
+        help="MIXED accepts every program. Equus / One-Stop covers Hudson, Bergen and Somerset counties." />
       <div className="sm:col-span-2"><Submit>{submitLabel}</Submit></div>
     </ActionForm>
   );

@@ -341,7 +341,7 @@ export async function assignStudentAction(_: ActionState, fd: FormData): Promise
   const course = klass ? await courses.findOne({ _id: klass.courseId }) : null;
   if (!klass || !course || klass.archived || course.archived) return { fieldErrors: { classId: "That class isn't available" } };
 
-  // Funding must match: a Hudson County student billed under an EQISS or private class (or the
+  // Funding must match: a Hudson County student billed under an Equus or private class (or the
   // reverse) is a billing and compliance error. MIXED classes accept any category.
   const category = app.category;
   const classOk = klass.fundingProgram === "MIXED" || klass.fundingProgram === category;

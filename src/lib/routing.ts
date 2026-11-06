@@ -34,3 +34,14 @@ export function homeFor(u: RoutingInput): string {
   if (u.role === "INSTRUCTOR") return u.instructorStatus === "APPROVED" ? "/instructor" : "/instructor/pending";
   return stagePath[studentStage(u.applicationStatus, !!u.hasActiveEnrollment, !!u.hasEarlierEnrollment)];
 }
+
+/**
+ * A "return to" path from the sign-in link, accepted only when it is a page on this site
+ * ("/dashboard", "/admin/applications/..."). Anything else (other sites, "//host", backslashes) is dropped.
+ */
+export function safeNextPath(next: unknown): string | null {
+  if (typeof next !== "string" || next.length > 500) return null;
+  if (!next.startsWith("/") || next.startsWith("//") || next.includes("\\") || /[\u0000-\u001f]/.test(next)) return null;
+  if (next.startsWith("/login") || next.startsWith("/api/")) return null;
+  return next;
+}

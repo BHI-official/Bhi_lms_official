@@ -60,7 +60,7 @@ const nextMonth = (m: string) => {
   return mo === 12 ? `${y + 1}-01` : `${y}-${String(mo + 1).padStart(2, "0")}`;
 };
 
-// ---------- EQISS / One-Stop: biweekly ITA report ----------
+// ---------- Equus / One-Stop: biweekly ITA report ----------
 
 /**
  * Where a student's two-week periods are counted from: the start of the first section they joined in
@@ -154,7 +154,7 @@ export async function biweeklyTotals(sheet: BiweeklyTimesheet) {
 }
 
 /**
- * Writes one day onto the student's EQISS biweekly report (creating that period's report if needed),
+ * Writes one day onto the student's Equus biweekly report (creating that period's report if needed),
  * so the report fills itself as the student checks in and fills out. Completed (fully signed) reports
  * are never touched. Returns true when the day was written.
  */
@@ -185,7 +185,7 @@ export async function syncBiweeklyDay(
 }
 
 /**
- * Writes a day's attendance onto the EQISS biweekly report so the report and the daily record always
+ * Writes a day's attendance onto the Equus biweekly report so the report and the daily record always
  * agree: attended days carry the times, other statuses become A / H / S with no hours. The customer's
  * initials are never filled in here; the student enters them on their own report.
  */
@@ -195,7 +195,7 @@ export async function syncRecordToBiweekly(enrollment: Enrollment, date: string,
 }
 
 /**
- * The other direction: when staff change days on an EQISS biweekly report, the daily records change to
+ * The other direction: when staff change days on an Equus biweekly report, the daily records change to
  * match, so admin screens, exports and the daily sign-off show the same thing as the report.
  */
 export async function syncBiweeklyToDays(sheet: BiweeklyTimesheet, before: BiweeklyDay[], byId: string) {

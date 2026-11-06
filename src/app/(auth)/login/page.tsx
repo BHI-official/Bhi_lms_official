@@ -3,17 +3,20 @@ import type { Metadata } from "next";
 import { ActionForm, Field, Submit } from "@/components/forms";
 import { Alert } from "@/components/ui";
 import { loginAction } from "../actions";
+import { safeNextPath } from "@/lib/routing";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ reset?: string }> }) {
-  const { reset } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ reset?: string; next?: string }> }) {
+  const { reset, next } = await searchParams;
+  const returnTo = safeNextPath(next);
   return (
     <>
       <h1 className="text-2xl font-semibold">Sign in</h1>
       <p className="mt-1 text-sm text-slate-600">Students, instructors and staff use the same sign-in.</p>
       {reset && <div className="mt-5"><Alert tone="success">Your password was changed. Sign in with the new one.</Alert></div>}
       <ActionForm action={loginAction} className="mt-6 space-y-4">
+        {returnTo && <input type="hidden" name="next" value={returnTo} />}
         <Field name="email" label="Email" type="email" autoComplete="email" required />
         <Field name="password" label="Password" type="password" autoComplete="current-password" required />
         <Submit className="w-full">Sign in</Submit>

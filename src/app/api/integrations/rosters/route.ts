@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const active = await enrollments.find({ status: "ACTIVE", classId: { $in: ks.map((k) => k._id) } }).toArray();
   const cs = await coursesById(ks.map((k) => k.courseId));
   const people = await usersById(active.map((e) => e.studentId));
-  // Which sheet each student uses: MONTHLY (DFS / Private, handwritten app) or BIWEEKLY (EQISS / One-Stop).
+  // Which sheet each student uses: MONTHLY (DFS / Private, handwritten app) or BIWEEKLY (Equus / One-Stop).
   const apps = new Map((await (await cols()).applications.find({ studentId: { $in: active.map((e) => e.studentId) } }, { projection: { studentId: 1, category: 1 } }).toArray()).map((a) => [a.studentId, a.category]));
   return Response.json(
     {

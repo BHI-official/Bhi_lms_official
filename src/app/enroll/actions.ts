@@ -23,7 +23,7 @@ import { answersHash, canEdit, editableSections, enrollmentState, nextStepPath, 
  */
 const editableFilter = (app: Application) => ({ _id: app._id, status: app.status });
 
-/** Enrollment type (Private / Non-Private), Non-Private program (EQISS / One-Stop or DFS) and county. */
+/** Enrollment type (Private / Non-Private), Non-Private program (Equus / One-Stop or DFS) and county. */
 export async function setCategoryAction(_: ActionState, fd: FormData): Promise<ActionState> {
   const { user, application } = await requireStudentStage("ENROLL");
   if (!canEdit(editableSections(application), SECTION_CATEGORY)) return { error: "Your enrollment type can't be changed right now." };

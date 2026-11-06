@@ -7,7 +7,7 @@ import { PdfWriter, pdfSafe } from "./text";
 const MARK: Record<string, string> = { PRESENT: "P", ABSENT: "A", LATE: "L", EXCUSED: "E" };
 
 /**
- * Generic attendance sheet (students x session dates). The official Hudson County and EQISS
+ * Generic attendance sheet (students x session dates). The official Hudson County and Equus
  * layouts will be added as separate renderers once their PDFs are received.
  */
 export async function buildAttendancePdf(classId: string, from: string, to: string): Promise<Uint8Array> {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { BiweeklyTimesheet } from "@/db";
-import { EQISS_TEXT } from "@/lib/eqiss-text";
+import { EQUUS_TEXT } from "@/lib/equus-text";
 import { COUNTY_LABELS } from "@/lib/forms/templates";
 import { biweeklyDueDate } from "@/lib/timesheet";
 import { todayLocal } from "@/lib/dates";
@@ -29,7 +29,7 @@ function SignatureBlock({ title, sig, current, statement }: { title: string; sig
   );
 }
 
-/** EQISS / One-Stop biweekly ITA report. Same sheet for Hudson, Bergen and Somerset counties. */
+/** Equus / One-Stop biweekly ITA report. Same sheet for Hudson, Bergen and Somerset counties. */
 export function BiweeklySheet({ sheet, totals, periods, basePath, viewer, studentName }: {
   sheet: BiweeklyTimesheet; totals: { total: number; cumulative: number; customerSignedCurrent: boolean; instructorSignedCurrent: boolean };
   periods: string[]; basePath: string; viewer: { role: "ADMIN" | "INSTRUCTOR" | "STUDENT"; name: string }; studentName: string;
@@ -51,14 +51,14 @@ export function BiweeklySheet({ sheet, totals, periods, basePath, viewer, studen
         <PrintButton />
       </div>
       <div>
-        <h2 className="text-lg font-semibold">{EQISS_TEXT.title}</h2>
+        <h2 className="text-lg font-semibold">{EQUUS_TEXT.title}</h2>
         <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-600">
           <Badge tone={tone}>{label}</Badge>
           {sheet.county && <span>{COUNTY_LABELS[sheet.county]}</span>}
           <span>Due by {due}</span>
           {overdue && <Badge tone="brick">Overdue</Badge>}
         </p>
-        <p className="mt-2 text-xs text-slate-500">{EQISS_TEXT.symbols} {EQISS_TEXT.submission}</p>
+        <p className="mt-2 text-xs text-slate-500">{EQUUS_TEXT.symbols} {EQUUS_TEXT.submission}</p>
       </div>
       {completed && viewer.role !== "STUDENT" && <Alert tone="success">Signed by the customer and the instructor. {viewer.role === "ADMIN" ? "Reopen it below to make changes." : "Ask an admin to reopen it to make changes."}</Alert>}
 
@@ -68,13 +68,13 @@ export function BiweeklySheet({ sheet, totals, periods, basePath, viewer, studen
       <Card title="Certification">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-3">
-            <SignatureBlock title="Customer / student signature" sig={sheet.customerSignature} current={totals.customerSignedCurrent} statement={EQISS_TEXT.customerCertification} />
+            <SignatureBlock title="Customer / student signature" sig={sheet.customerSignature} current={totals.customerSignedCurrent} statement={EQUUS_TEXT.customerCertification} />
             {viewer.role === "STUDENT" && !completed && (!sheet.customerSignature || !totals.customerSignedCurrent) && (
               <div className="print:hidden"><SignForm action={signBiweeklyAction.bind(null, sheet._id)} defaultName={viewer.name} label="Sign as customer" /></div>
             )}
           </div>
           <div className="space-y-3">
-            <SignatureBlock title="Instructor signature" sig={sheet.instructorSignature} current={totals.instructorSignedCurrent} statement={EQISS_TEXT.instructorCertification} />
+            <SignatureBlock title="Instructor signature" sig={sheet.instructorSignature} current={totals.instructorSignedCurrent} statement={EQUUS_TEXT.instructorCertification} />
             {viewer.role !== "STUDENT" && !completed && (
               <div className="print:hidden"><SignForm action={signBiweeklyAction.bind(null, sheet._id)} defaultName={viewer.name} label="Sign as instructor" /></div>
             )}

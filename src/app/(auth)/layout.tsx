@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <p className="mt-10 max-w-xs text-2xl font-semibold leading-snug">From application to your first class, in one place.</p>
         </div>
         <Journey current={0} tone="dark" />
-        <p className="text-xs text-white/60">Hudson County,EQISS and private students</p>
+        <p className="text-xs text-white/60">Hudson County, Equus and private students</p>
       </aside>
       <main className="flex items-center justify-center px-5 py-12">
         <div className="w-full max-w-md">{children}</div>

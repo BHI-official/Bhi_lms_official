@@ -133,8 +133,10 @@ const COMMON = {
   workforce_registration: { acknowledged: "on" },
   grievance_policy: { acknowledged: "on" },
   photo_release: { photoRelease: "I give permission" },
+  photo_release_dfs: { photoRelease: "I give permission", signerRole: "Student (18 or older)", signerName: "Test Student" },
+  personal_information: { firstName: "Test", lastName: "Student", ssn: "123-45-6789", dateOfBirth: "1990-01-01", gender: "Female", address1: "1 Main St", city: "Jersey City", state: "NJ", zip: "07306", ethnicity: "Non-Hispanic", race: "White", exhaustedTanf: "No", disability: "No", englishLearner: "No", wioa: "No", unhoused: "No", fosterCare: "No", formerlyIncarcerated: "No" },
 };
-const NONPRIVATE = { nonprivate_agreement: { acknowledged: "on" } };
+const NONPRIVATE = { nonprivate_agreement: { studentName: "Test Student" } };
 const PRIVATE = { private_agreement_1: { acknowledged: "on" }, private_agreement_2: { acknowledged: "on" }, refund_schedule: { acknowledged: "on" } };
 const UNSIGNED = new Set(["student_data", "educational_background"]);
 
@@ -187,7 +189,7 @@ ok("student registers and verifies email; lands on enrollment, not the dashboard
 assert.equal((await ana.get("/dashboard")).location, "/enroll"); ok("no dashboard before approval");
 {
   let r = await ana.action("/enroll", "setCategoryAction", [{}, fd({ enrollmentType: "NON_PRIVATE" })]);
-  assert.match(r.text, /EQISS \/ One-Stop or DFS/); ok("Non-Private requires choosing EQISS / One-Stop or DFS");
+  assert.match(r.text, /Equus \/ One-Stop or DFS/); ok("Non-Private requires choosing EQISS / One-Stop or DFS");
   r = await ana.action("/enroll", "setCategoryAction", [{}, fd({ enrollmentType: "NON_PRIVATE", fundingProgram: "EQISS" })]);
   assert.match(r.text, /Hudson, Bergen or Somerset/); ok("EQISS requires a county");
   r = await ana.action("/enroll", "setCategoryAction", [{}, fd({ enrollmentType: "NON_PRIVATE", fundingProgram: "EQISS", county: "HUDSON" })]);

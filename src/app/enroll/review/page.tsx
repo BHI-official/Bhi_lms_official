@@ -11,6 +11,7 @@ import { StudentShell } from "@/components/student-shell";
 import { Alert, Card, PageHeader, fmtDate } from "@/components/ui";
 import { EnrollNav } from "../enroll-nav";
 import { SubmitForm } from "./submit-form";
+import { PdfActions } from "@/components/pdf-actions";
 
 export const metadata: Metadata = { title: "Review and submit" };
 export const dynamic = "force-dynamic";
@@ -24,14 +25,15 @@ export default async function ReviewPage() {
 
   return (
     <StudentShell name={user.name} step={1} nav={<EnrollNav app={application} active="review" />}>
-      <PageHeader title="Review and submit" description={describeEnrollment(application)} />
+      <PageHeader title="Review and submit" description={describeEnrollment(application)}
+        actions={<span className="flex flex-wrap items-center gap-2 text-sm"><span className="font-medium text-slate-600">All forms (PDF):</span><PdfActions href={`/api/pdf/application/${application._id}`} label="all my enrollment forms" /></span>} />
       <div className="space-y-5">
         <Card title="Course" actions={<Link href="/enroll/course" className="text-sm font-semibold text-pine-700 underline">Change</Link>}>
           <p className="text-sm">{course ? <strong>{course.name}</strong> : <span className="font-semibold text-brick-600">Not chosen</span>}</p>
         </Card>
         {state.forms.map((f) => (
           <Card key={f.template.key} title={f.template.title}
-            actions={<Link href={`/enroll/forms/${f.template.key}`} className="text-sm font-semibold text-pine-700 underline">Edit</Link>}>
+            actions={<span className="flex flex-wrap items-center gap-3">{application.forms?.[f.template.key] && <PdfActions compact href={`/api/pdf/application/${application._id}/forms/${f.template.key}`} label={f.template.title} />}<Link href={`/enroll/forms/${f.template.key}`} className="text-sm font-semibold text-pine-700 underline">Edit</Link></span>}>
             <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
               {inputFields(f.template).map((fd) => (
                 <div key={fd.name}>

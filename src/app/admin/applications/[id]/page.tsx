@@ -11,6 +11,7 @@ import { CategoryForm } from "@/app/enroll/category-form";
 import { AdminCourseForm } from "@/components/admin-app-edit";
 import { Alert, Card, PageHeader, StatusBadge, fmtDate, fmtDateTime } from "@/components/ui";
 import { ActionButton, CorrectionsForm, RejectForm } from "@/components/action-widgets";
+import { PdfActions } from "@/components/pdf-actions";
 import { formatUsd } from "@/lib/payment";
 import { stripeEnabled } from "@/lib/tuition";
 import {
@@ -49,7 +50,7 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
       <PageHeader
         title={student.name}
         description={<>{student.email}, {describeEnrollment(app)}, {course ? course.name : "no course chosen"}, submitted {fmtDate(app.submittedAt)} <StatusBadge status={app.status} /></>}
-        actions={<a href={`/api/pdf/application/${app._id}`} className="rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold">Download PDF</a>}
+        actions={<span className="flex flex-wrap items-center gap-2 text-sm"><span className="font-medium text-slate-600">Full packet (PDF):</span><PdfActions href={`/api/pdf/application/${app._id}`} label="the enrollment packet" /></span>}
       />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
@@ -60,7 +61,7 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
           <Card title="Enrollment">
             <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
               <div><dt className="text-slate-500">Enrollment type</dt><dd className="font-medium">{app.enrollmentType === "PRIVATE" ? "Private" : app.enrollmentType === "NON_PRIVATE" ? "Non-Private" : "-"}</dd></div>
-              <div><dt className="text-slate-500">Funding program</dt><dd className="font-medium">{app.fundingProgram === "EQISS" ? "EQISS / One-Stop" : app.fundingProgram === "DFS" ? "DFS (Department of Family Services)" : app.category === "PRIVATE" ? "Private (self-paying)" : "-"}</dd></div>
+              <div><dt className="text-slate-500">Funding program</dt><dd className="font-medium">{app.fundingProgram === "EQISS" ? "Equus / One-Stop" : app.fundingProgram === "DFS" ? "DFS (Department of Family Services)" : app.category === "PRIVATE" ? "Private (self-paying)" : "-"}</dd></div>
               <div><dt className="text-slate-500">County</dt><dd className="font-medium">{app.county ? describeEnrollment(app).split(", ")[1] : "-"}</dd></div>
               <div><dt className="text-slate-500">Course</dt><dd className="font-medium">{course ? `${course.name}${course.archived ? " (archived)" : ""}` : <span className="text-brick-600">Not chosen</span>}</dd></div>
             </dl>
@@ -71,7 +72,7 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
             return (
               <div key={f.template.key} className="space-y-2">
               {newGroup && <h2 className="pt-2 text-sm font-semibold uppercase tracking-wide text-slate-500">{GROUP_LABELS[f.template.group]}</h2>}
-              <Card title={f.template.title} actions={<Link href={`/admin/applications/${app._id}/forms/${f.template.key}`} className="text-sm font-semibold text-pine-700 underline">Edit</Link>}>
+              <Card title={f.template.title} actions={<span className="flex flex-wrap items-center gap-3"><PdfActions compact href={`/api/pdf/application/${app._id}/forms/${f.template.key}`} label={f.template.title} /><Link href={`/admin/applications/${app._id}/forms/${f.template.key}`} className="text-sm font-semibold text-pine-700 underline">Edit</Link></span>}>
                 <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
                   {inputFields(f.template).map((fd) => (
                     <div key={fd.name}>
@@ -241,6 +242,8 @@ const HISTORY: Record<string, string> = {
   "application.admin_edit_form": "A form was edited by staff", "application.sign": "A form was signed", "application.set_category": "Enrollment type chosen",
   "application.set_course": "Course chosen", "application.payment_opened": "Started paying online", "application.checkout_started": "Opened the payment page",
   "application.payment_received": "Tuition paid online", "application.payment_status": "Payment status changed by staff", "application.view_ssn": "Staff viewed a form with the Social Security number",
+  "application.download_pdf": "Enrollment packet PDF downloaded", "application.print_pdf": "Enrollment packet opened to print",
+  "application.download_form_pdf": "A form PDF was downloaded", "application.print_form_pdf": "A form was opened to print",
 };
 function historyText(action: string) {
   return HISTORY[action] ?? action.replace("application.", "").replace(/_/g, " ");

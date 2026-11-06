@@ -10,7 +10,7 @@ import { formatUsd } from "@/lib/payment";
 import { feesTotalCents } from "@/lib/forms/templates";
 
 export const metadata: Metadata = { title: "Courses and classes" };
-const PROGRAM: Record<string, string> = { PRIVATE: "Private", EQISS: "EQISS / One-Stop", DFS: "DFS", MIXED: "Mixed" };
+const PROGRAM: Record<string, string> = { PRIVATE: "Private", EQISS: "Equus / One-Stop", DFS: "DFS", MIXED: "Mixed" };
 
 export default async function CoursesPage() {
   await requireAdmin();

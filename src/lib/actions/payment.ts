@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { cols } from "@/db";
-import { env } from "@/lib/env";
+import { appBaseUrl } from "@/lib/app-url";
 import { requireUser, homePath } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { audit } from "@/lib/audit";
@@ -49,7 +49,8 @@ export async function startCheckoutAction(_: ActionState): Promise<ActionState> 
   }
 
   const attempt = request.checkoutAttempts ?? 0;
-  const base = env().APP_URL.replace(/\/$/, "");
+  // Stripe sends the student back here after paying, so this must be the public address (lib/app-url).
+  const base = await appBaseUrl();
   const back = application.status === "DRAFT" || application.status === "CORRECTIONS_REQUESTED" ? "/enroll/payment" : "/application";
   const session = await stripe().checkout.sessions.create(
     {

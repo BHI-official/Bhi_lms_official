@@ -32,14 +32,20 @@ const COMMON = ["student_data", "educational_background", "background_check", "e
 test("every track gets the 7 Common Forms once, in the packet order", () => {
   for (const c of ["PRIVATE", "EQISS", "DFS"] as const) {
     const keys = templatesFor(c).map((t) => t.key);
-    assert.deepEqual(keys.slice(0, 7), COMMON, c);
+    // DFS students sign the HCDFS Photo Release in the same place as everyone else's BHI one.
+    assert.deepEqual(keys.slice(0, 7), c === "DFS" ? [...COMMON.slice(0, 6), "photo_release_dfs"] : COMMON, c);
     assert.equal(new Set(keys).size, keys.length, `${c}: duplicate templates`);
   }
 });
 
-test("Private gets Private Forms; Non-Private gets the Non-Private agreement only", () => {
+test("Private gets Private Forms; Equus gets the agreement; DFS gets the HCDFS Personal Information and agreement", () => {
   assert.deepEqual(templatesFor("PRIVATE").slice(7).map((t) => t.key), ["private_agreement_1", "private_agreement_2", "refund_schedule"]);
-  for (const c of ["EQISS", "DFS"] as const) assert.deepEqual(templatesFor(c).slice(7).map((t) => t.key), ["nonprivate_agreement"]);
+  assert.deepEqual(templatesFor("EQISS").slice(7).map((t) => t.key), ["nonprivate_agreement"]);
+  assert.deepEqual(templatesFor("DFS").slice(7).map((t) => t.key), ["personal_information", "nonprivate_agreement"]);
+  // Every track signs exactly one photo release: DFS the HCDFS version, everyone else BHI's.
+  assert.deepEqual(templatesFor("DFS").filter((t) => t.key.startsWith("photo_release")).map((t) => t.key), ["photo_release_dfs"]);
+  for (const c of ["PRIVATE", "EQISS"] as const) assert.deepEqual(templatesFor(c).filter((t) => t.key.startsWith("photo_release")).map((t) => t.key), ["photo_release"]);
+  assert.equal(TEMPLATES.filter((t) => t.pendingOfficialText).length, 0);
   assert.ok(templatesFor("PRIVATE").filter((t) => t.group === "PRIVATE").every((t) => t.containsFees));
 });
 
@@ -73,7 +79,7 @@ test("all three EQISS counties share one attendance format; DFS and Private use 
   assert.equal(attendanceFormatFor("EQISS"), "BIWEEKLY");
   assert.equal(attendanceFormatFor("DFS"), "MONTHLY");
   assert.equal(attendanceFormatFor("PRIVATE"), "MONTHLY");
-  assert.equal(describeEnrollment({ category: "EQISS", county: "SOMERSET" }), "Non-Private: EQISS / One-Stop, Somerset County");
+  assert.equal(describeEnrollment({ category: "EQISS", county: "SOMERSET" }), "Non-Private: Equus / One-Stop, Somerset County");
 });
 
 test("payment gate: approval always needs a settled Private payment; Non-Private is never gated", () => {
@@ -322,8 +328,8 @@ test("rate limit counts the overlap with the previous window", () => {
 
 // ---- Official enrollment forms (October 2026 packets) ----
 
-test("all Common and Private forms carry the official wording; only the Non-Private agreement is still pending", () => {
-  assert.deepEqual(TEMPLATES.filter((t) => t.pendingOfficialText).map((t) => t.key), ["nonprivate_agreement"]);
+test("every form carries the official wording (the Non-Private agreement came with the HCDFS packet)", () => {
+  assert.deepEqual(TEMPLATES.filter((t) => t.pendingOfficialText).map((t) => t.key), []);
   assert.equal(TEMPLATES.some((t) => t.key === "laptop_receipt"), false, "laptop receipt is signed in person, not online");
   assert.deepEqual(templatesFor("PRIVATE").map((t) => t.key).slice(7), ["private_agreement_1", "private_agreement_2", "refund_schedule"]);
 });
@@ -368,4 +374,23 @@ test("Private payment comes before the forms", () => {
   assert.ok(formsBlockedByPayment({ category: "PRIVATE", paymentStatus: "REQUESTED" }));
   assert.ok(!formsBlockedByPayment({ category: "PRIVATE", paymentStatus: "PAID" }));
   assert.ok(!formsBlockedByPayment({ category: "EQISS", paymentStatus: "NOT_REQUIRED" }));
+});
+
+test("the program is spelled Equus wherever people read it (EQISS stays only as the stored code)", async () => {
+  const { CATEGORY_LABELS, PROGRAM_LABELS } = await import("../src/lib/forms/templates");
+  for (const label of [...Object.values(CATEGORY_LABELS), ...Object.values(PROGRAM_LABELS)]) assert.doesNotMatch(label, /eqiss/i);
+  assert.equal(PROGRAM_LABELS.EQISS, "Equus / One-Stop");
+});
+
+test("sign-in only returns to pages on this site", async () => {
+  const { safeNextPath } = await import("../src/lib/routing");
+  assert.equal(safeNextPath("/dashboard"), "/dashboard");
+  assert.equal(safeNextPath("/admin/applications/abc?x=1"), "/admin/applications/abc?x=1");
+  for (const bad of ["https://evil.example", "//evil.example", "/\\evil", "dashboard", "/login?next=/x", "/api/pdf/x", null, 5]) assert.equal(safeNextPath(bad), null);
+});
+
+test("email links never use a private-network or localhost address when a public one is known", async () => {
+  const { isPrivateUrl } = await import("../src/lib/url-host");
+  for (const u of ["http://localhost:3000", "http://127.0.0.1", "http://192.168.1.20:3000", "http://10.0.0.5", "http://172.20.1.1", "http://bhi-server:3000", "http://lms.local"]) assert.ok(isPrivateUrl(u), u);
+  for (const u of ["https://lms.brighthorizoninstitute.com", "https://bhi.vercel.app", "http://203.0.113.9"]) assert.ok(!isPrivateUrl(u), u);
 });

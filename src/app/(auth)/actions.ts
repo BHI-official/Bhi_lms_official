@@ -11,6 +11,7 @@ import { notifyAdminsInstructorSignup, sendOtpEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
 import { audit } from "@/lib/audit";
 import { homePath } from "@/lib/auth";
+import { safeNextPath } from "@/lib/routing";
 import { invalid, formObject, type ActionState } from "@/lib/action";
 import { canonicalEmail } from "@/lib/email-canonical";
 import { inviteHash, isWellFormedToken } from "@/lib/invite";
@@ -161,7 +162,9 @@ export async function loginAction(_: ActionState, fd: FormData): Promise<ActionS
     if (otp.ok) await sendOtpEmail(user.email, user.name, otp.code, "VERIFY_EMAIL");
     redirect("/verify");
   }
-  redirect(await homePath(user));
+  // Back to the page they opened from an email link. If it isn't theirs (wrong role or stage), that
+  // page sends them on to their own home page, so this never shows them a dead end.
+  redirect(safeNextPath(fd.get("next")) ?? (await homePath(user)));
 }
 
 export async function logoutAction() {

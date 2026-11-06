@@ -8,6 +8,7 @@ import { CheckInBox } from "@/components/checkin-box";
 import { checkInAction, fillMyAttendanceAction } from "@/lib/actions/checkin";
 import { todayLocal } from "@/lib/dates";
 import { StudentShell } from "@/components/student-shell";
+import { PdfActions } from "@/components/pdf-actions";
 import { Card, PageHeader, StatusBadge, fmtDate } from "@/components/ui";
 
 export const metadata: Metadata = { title: "My dashboard" };
@@ -38,6 +39,10 @@ export default async function StudentDashboard() {
           <div><dt className="text-slate-500">Enrollment</dt><dd className="font-medium">{describeEnrollment(application)}</dd></div>
         </dl>
         <a href="https://classroom.google.com" target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 rounded-md bg-pine-700 px-4 py-2 text-sm font-semibold text-white hover:bg-pine-800">Open Google Classroom ↗</a>
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4 text-sm">
+          <span className="font-medium text-slate-600">My enrollment forms (PDF):</span>
+          <PdfActions href={`/api/pdf/application/${application._id}`} label="my enrollment forms" />
+        </div>
       </Card>
       {rows.length === 0 && (
         <Card title="No current class" className="mb-6">

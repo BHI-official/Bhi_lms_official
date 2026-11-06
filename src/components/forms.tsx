@@ -79,6 +79,8 @@ type FieldProps = {
   required?: boolean;
   help?: string;
   options?: string[];
+  /** Display text for select options whose stored value is a code (e.g. EQISS shown as "Equus / One-Stop"). */
+  optionLabels?: Record<string, string>;
   autoComplete?: string;
   maxLength?: number;
   inputMode?: "numeric" | "decimal" | "text" | "email" | "tel";
@@ -110,7 +112,7 @@ export function Field(p: FieldProps) {
       ) : p.type === "select" ? (
         <select {...common} className={inputCls}>
           <option value="">Choose...</option>
-          {p.options?.map((o) => <option key={o} value={o}>{o}</option>)}
+          {p.options?.map((o) => <option key={o} value={o}>{p.optionLabels?.[o] ?? o}</option>)}
         </select>
       ) : (
         <input
