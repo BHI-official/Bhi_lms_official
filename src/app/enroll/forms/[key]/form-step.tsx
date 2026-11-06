@@ -14,9 +14,9 @@ function FieldInput({ f, value }: { f: FieldDef; value: unknown }) {
     case "checkbox":
       return <Checkbox name={f.name} label={f.label} defaultChecked={value === true} required={f.required} />;
     case "radio":
-      return <RadioGroup name={f.name} label={f.label} options={f.options ?? []} defaultValue={typeof value === "string" ? value : undefined} required={f.required} />;
+      return <RadioGroup name={f.name} label={f.label} options={f.options ?? []} defaultValue={typeof value === "string" ? value : undefined} required={f.required} help={f.help} />;
     case "multi":
-      return <CheckGroup name={f.name} label={f.label} options={f.options ?? []} defaultValue={Array.isArray(value) ? (value as string[]) : []} required={f.required} />;
+      return <CheckGroup name={f.name} label={f.label} options={f.options ?? []} defaultValue={Array.isArray(value) ? (value as string[]) : []} required={f.required} help={f.help} />;
     case "ssn":
       return <Field name={f.name} label={f.label} type="text" inputMode="numeric" autoComplete="off" placeholder="123-45-6789" required={f.required} maxLength={11}
         help="Only BHI staff can see this number." defaultValue={typeof value === "string" ? value : ""} />;

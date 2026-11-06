@@ -11,9 +11,9 @@ import { bodyOf, describeEnrollment, documentsFor, templatesFor, type FormTempla
 import { BhiLayout, ROWS } from "./bhi-layout";
 import { FormPage, embedSignature, usDate, type Fonts } from "./draw";
 import { ORIGINALS, type FormInput, type OfficialUse } from "./originals";
-import { printableForms } from "./list";
+import { printableForms, printedAnswers } from "./list";
 
-export { printableForms };
+export { printableForms, printedAnswers };
 
 /**
  * Print-ready enrollment forms. Each form the student filled in online comes out on BHI's own
@@ -75,7 +75,8 @@ export async function startDoc(title: string) {
 /** Adds one form (one or more pages) to the document. */
 export async function addForm(out: Awaited<ReturnType<typeof startDoc>>, t: FormTemplate, l: Loaded, extra: { ctx: FormInput["ctx"]; official?: OfficialUse }) {
   const { doc, fonts, logo } = out;
-  const data = (l.app.forms?.[t.key]?.data ?? {}) as Record<string, unknown>;
+  const saved = l.app.forms?.[t.key];
+  const data = printedAnswers(t, (saved?.data ?? {}) as Record<string, unknown>, !!saved?.completedAt);
   const sig = t.requiresSignature ? l.app.signatures?.[t.key] : undefined;
   const input: FormInput = {
     key: t.key,

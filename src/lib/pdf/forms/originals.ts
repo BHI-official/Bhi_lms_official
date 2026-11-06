@@ -187,7 +187,12 @@ export const ORIGINALS: Record<string, OriginalLayout> = {
       const v = (k: string) => d(f, k);
       const box = (val: unknown, b: Box) => p.inBox(val, b);
       const tick = (b: Box, on: boolean) => p.checkBox(b, on);
-      const parts = (val: unknown, boxes: [Box, Box, Box]) => dateParts(val).forEach((x, i) => box(x, boxes[i]));
+      // mm / dd / yyyy boxes; "N/A" or "Present" goes in the first box.
+      const parts = (val: unknown, boxes: [Box, Box, Box]) => {
+        const [mm, dd, yyyy] = dateParts(val);
+        if (!mm && str(val)) return p.text(str(val), boxes[0][0] + 1, boxes[0][1] + 1.5, boxes[2][2] - boxes[0][0], { size: 8 });
+        [mm, dd, yyyy].forEach((x, i) => box(x, boxes[i]));
+      };
 
       // Case # is filled in by the One-Stop office.
       parts(v("todaysDate"), [[436, 724, 468, 741], [478, 724, 518, 741], [529, 724, 561, 741]]);

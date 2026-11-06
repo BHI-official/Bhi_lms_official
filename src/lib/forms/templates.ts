@@ -41,6 +41,16 @@ export type Field = {
   maxLength?: number;
   /** Pre-fills an empty field: "name" / "email" (the account) or "<formKey>.<field>" (an earlier form). */
   prefill?: string;
+  /**
+   * Required only when it applies, e.g. "Alien Reg. #" when the student is not a US citizen. Every
+   * other answer field is plainly `required`, so every printed form comes out complete; a question
+   * that doesn't apply prints as "N/A".
+   */
+  requiredIf?: (data: Record<string, unknown>) => boolean;
+  /** Error shown when a requiredIf field is left empty (default "This field is required"). */
+  requiredMessage?: string;
+  /** The only kind of answer that may be left empty: a free "questions or comments" box. */
+  optionalComment?: boolean;
 };
 
 /** What a form's text can refer to: the student's name and, for Private forms, the chosen course and its fees. */
@@ -130,18 +140,21 @@ export const RACES = [
 ];
 export const SIGNER_ROLES = ["Student (18 or older)", "Parent", "Guardian"];
 export const SIGN_DATE_NOTE = "Your signature and today's date are recorded when you sign below.";
-const QUESTIONS: Field = { name: "questionsComments", label: "Questions or comments (on paper: \"please write any questions or comments you have on the back of this sheet\")", type: "textarea", maxLength: 2000 };
+const QUESTIONS: Field = { name: "questionsComments", label: "Questions or comments (on paper: \"please write any questions or comments you have on the back of this sheet\")", type: "textarea", maxLength: 2000, optionalComment: true };
 
 /** "Explain" becomes required when any of the listed questions is answered Yes. */
-const explainIfYes = (questions: string[], explain: string) => (d: Record<string, unknown>): Record<string, string> =>
-  questions.some((q) => d[q] === "Yes") && !String(d[explain] ?? "").trim() ? { [explain]: "Please explain, because you answered Yes" } : {};
+const yn = (name: string, label: string): Field => ({ name, label, type: "radio", options: YES_NO, required: true });
 
-const yn = (name: string, label: string, required = true): Field => ({ name, label, type: "radio", options: YES_NO, required });
+/** Shown under answers that some students won't have (a fax number, a second contact). */
+const NA = "Required. Write N/A if this doesn't apply to you.";
+const isYes = (field: string) => (d: Record<string, unknown>) => d[field] === "Yes";
+const anyYes = (fields: string[]) => (d: Record<string, unknown>) => fields.some((f) => d[f] === "Yes");
+const explainYes = "Please explain, because you answered Yes";
 
 export const TEMPLATES: FormTemplate[] = [
   // ----- Common Forms -----
   {
-    key: "student_data", title: "Student Data", version: 2, group: "COMMON", appliesTo: "ALL",
+    key: "student_data", title: "Student Data", version: 3, group: "COMMON", appliesTo: "ALL",
     containsFees: false, requiresSignature: true, pendingOfficialText: false,
     fields: [
       { name: "orientation", label: "There is a mandatory orientation scheduled before the first day of class and I agree to make myself available.", type: "checkbox", required: true },
@@ -154,16 +167,16 @@ export const TEMPLATES: FormTemplate[] = [
       { name: "state", label: "State", type: "text", required: true, maxLength: 40 },
       { name: "zip", label: "ZIP code", type: "text", required: true, maxLength: 10 },
       { name: "cellPhone", label: "CELL Phone", type: "tel", required: true, maxLength: 30 },
-      { name: "homePhone", label: "HOME Phone", type: "tel", maxLength: 30 },
-      { name: "workPhone", label: "WORK Phone", type: "tel", maxLength: 30 },
+      { name: "homePhone", label: "HOME Phone", type: "tel", required: true, maxLength: 30, help: NA },
+      { name: "workPhone", label: "WORK Phone", type: "tel", required: true, maxLength: 30, help: NA },
       { name: "email", label: "Email Address:", type: "email", required: true, maxLength: 160, prefill: "email" },
-      { name: "gender", label: "Gender:", type: "text", maxLength: 40 },
-      { name: "ethnicity", label: "Ethnicity:", type: "text", maxLength: 80 },
+      { name: "gender", label: "Gender:", type: "text", required: true, maxLength: 40, help: NA },
+      { name: "ethnicity", label: "Ethnicity:", type: "text", required: true, maxLength: 80, help: NA },
       { name: "h_social", label: "Social Media (Optional)", type: "heading" },
       { name: "n_social", label: "Please be advised we would like to stay in touch with you at all times as well as use every angle we to make you more marketable in the industry of choice.", type: "note" },
-      { name: "facebook", label: "Facebook:", type: "text", maxLength: 200 },
-      { name: "twitter", label: "Twitter:", type: "text", maxLength: 200 },
-      { name: "linkedin", label: "Linkedin:", type: "text", maxLength: 200 },
+      { name: "facebook", label: "Facebook:", type: "text", required: true, maxLength: 200, help: NA },
+      { name: "twitter", label: "Twitter:", type: "text", required: true, maxLength: 200, help: NA },
+      { name: "linkedin", label: "Linkedin:", type: "text", required: true, maxLength: 200, help: NA },
       { name: "h_release", label: "Job Placement-information Release Authorization", type: "heading" },
       {
         name: "n_release", type: "note",
@@ -173,25 +186,28 @@ export const TEMPLATES: FormTemplate[] = [
     ],
   },
   {
-    key: "educational_background", title: "Educational Background", version: 2, group: "COMMON", appliesTo: "ALL",
+    key: "educational_background", title: "Educational Background", version: 3, group: "COMMON", appliesTo: "ALL",
     containsFees: false, requiresSignature: false, pendingOfficialText: false,
     fields: [
-      { name: "highSchoolName", label: "High School Name", type: "text", maxLength: 160 },
-      { name: "highSchoolAddress", label: "Address:", type: "textarea", maxLength: 400 },
-      { name: "highSchoolYear", label: "Year Completed:", type: "text", maxLength: 10 },
+      { name: "highSchoolName", label: "High School Name", type: "text", required: true, maxLength: 160 },
+      { name: "highSchoolAddress", label: "Address:", type: "textarea", required: true, maxLength: 400 },
+      { name: "highSchoolYear", label: "Year Completed:", type: "text", required: true, maxLength: 10 },
       yn("hsDiploma", "Did you achieve your High School diploma?"),
-      yn("hasGed", "Do you have a G.E.D.? (Only if it applies)", false),
-      yn("seekingGed", "Are you currently seeking to get your G.E.D?", false),
-      { name: "tabeReading", label: "T.A.B.E. test grade: Reading level", type: "text", maxLength: 40 },
-      { name: "tabeMath", label: "Math Level", type: "text", maxLength: 40 },
+      yn("hasGed", "Do you have a G.E.D.? (Only if it applies)"),
+      yn("seekingGed", "Are you currently seeking to get your G.E.D?"),
+      { name: "tabeReading", label: "T.A.B.E. test grade: Reading level", type: "text", required: true, maxLength: 40, help: "Required. Write N/A if you haven\u2019t taken the T.A.B.E. test." },
+      { name: "tabeMath", label: "Math Level", type: "text", required: true, maxLength: 40, help: "Required. Write N/A if you haven\u2019t taken the T.A.B.E. test." },
       { name: "h_college", label: "Previous College Information", type: "heading" },
-      { name: "collegeName", label: "School Name:", type: "text", maxLength: 160 },
+      yn("attendedCollege", "Have you attended college?"),
+      { name: "collegeName", label: "School Name:", type: "text", maxLength: 160, help: "Required if you attended college.", requiredIf: isYes("attendedCollege") },
       {
         name: "degree", label: "Degree: (Please check one)", type: "radio",
         options: ["Associate", "Bachelor's (of Science, of Arts, of fine arts, of administration, of architecture)", "Masters", "Certificate of Completion"],
+        help: "Required if you attended college.",
+        requiredIf: isYes("attendedCollege"),
       },
-      { name: "collegeAddress", label: "School Address:", type: "textarea", maxLength: 400 },
-      { name: "collegeYear", label: "Year Completed:", type: "text", maxLength: 10 },
+      { name: "collegeAddress", label: "School Address:", type: "textarea", maxLength: 400, help: "Required if you attended college.", requiredIf: isYes("attendedCollege") },
+      { name: "collegeYear", label: "Year Completed:", type: "text", maxLength: 10, help: "Required if you attended college.", requiredIf: isYes("attendedCollege") },
       { name: "h_payment", label: "Payment information:", type: "heading" },
       { name: "fundingPlan", label: "How do you plan to fund your education?", type: "textarea", required: true, maxLength: 1000 },
       { name: "workforceFunding", label: "Will you be seeking funding from workforce?", type: "radio", options: ["YES", "NO"], required: true },
@@ -200,36 +216,35 @@ export const TEMPLATES: FormTemplate[] = [
     ],
   },
   {
-    key: "background_check", title: "Background Check Form", version: 2, group: "COMMON", appliesTo: "ALL",
+    key: "background_check", title: "Background Check Form", version: 3, group: "COMMON", appliesTo: "ALL",
     containsFees: false, requiresSignature: true, pendingOfficialText: false,
     body: ["All information will be kept strictly confidential."],
     fields: [
       { name: "firstName", label: "Name: First", type: "text", required: true, maxLength: 80 },
-      { name: "middleName", label: "Middle", type: "text", maxLength: 80 },
+      { name: "middleName", label: "Middle", type: "text", required: true, maxLength: 80, help: NA },
       { name: "lastName", label: "Last", type: "text", required: true, maxLength: 80 },
       { name: "street", label: "Address: Street", type: "text", required: true, maxLength: 160, prefill: "student_data.street" },
       { name: "city", label: "City", type: "text", required: true, maxLength: 80, prefill: "student_data.city" },
       { name: "state", label: "State", type: "text", required: true, maxLength: 40, prefill: "student_data.state" },
       { name: "zip", label: "Zip", type: "text", required: true, maxLength: 10, prefill: "student_data.zip" },
-      { name: "otherNames", label: "Maiden Name or Other Names Used", type: "text", maxLength: 160 },
+      { name: "otherNames", label: "Maiden Name or Other Names Used", type: "text", required: true, maxLength: 160, help: NA },
       { name: "dateOfBirth", label: "Date of Birth", type: "date", required: true, prefill: "student_data.dateOfBirth" },
       { name: "ssn", label: "Social Security #", type: "ssn", required: true, prefill: "student_data.ssn" },
       yn("arrested", "Have you ever been arrested or convicted for any criminal offense excluding minor traffic violations?"),
       yn("abuse", "Have you ever been accused, arrested or convicted of abuse or sexually related crimes?"),
       yn("lifestyle", "Is there anything in your life-style or background that would call into question your ability?"),
-      { name: "explain", label: "If you answered yes to any of these questions, please explain:", type: "textarea", maxLength: 2000 },
+      { name: "explain", label: "If you answered yes to any of these questions, please explain:", type: "textarea", maxLength: 2000, help: "Required if you answered Yes to any question above.", requiredIf: anyYes(["arrested", "abuse", "lifestyle"]), requiredMessage: explainYes },
       { name: "n_yes", label: "Please note: answering \"yes\" to any of these questions does not automatically disqualify you. Please use the spaces provided to explain the circumstances.", type: "note" },
-      { name: "expungement", label: "Have your previously or are you currently seeking for your expungement for your records? If so where in the process are you? If not please explain why", type: "textarea", maxLength: 2000 },
+      { name: "expungement", label: "Have your previously or are you currently seeking for your expungement for your records? If so where in the process are you? If not please explain why", type: "textarea", required: true, maxLength: 2000, help: NA },
       {
         name: "n_authorize", type: "note",
         label: "I hereby authorize Bright Horizon Institute to make an independent investigation of my background and criminal or police records. I release Bright Horizon Institute, and any person or entity which provides information pursuant to this authorization, from any and all liabilities, claims or law suits in regards to the information obtained from any and all of the above sources. The information contained in this application is correct to the best of my knowledge. I understand that any omission of material fact on this application may be grounds for rejection of this application.",
       },
       QUESTIONS,
     ],
-    check: explainIfYes(["arrested", "abuse", "lifestyle"], "explain"),
   },
   {
-    key: "emergency_medical", title: "Emergency Medical Statement", version: 2, group: "COMMON", appliesTo: "ALL",
+    key: "emergency_medical", title: "Emergency Medical Statement", version: 3, group: "COMMON", appliesTo: "ALL",
     containsFees: false, requiresSignature: true, pendingOfficialText: false,
     fields: [
       { name: "h_emergency", label: "EMERGENCY INFORMATION:", type: "heading" },
@@ -237,11 +252,11 @@ export const TEMPLATES: FormTemplate[] = [
       { name: "contact1Name", label: "1) Name:", type: "text", required: true, maxLength: 120 },
       { name: "contact1Relationship", label: "Relationship:", type: "text", required: true, maxLength: 60 },
       { name: "contact1Phone", label: "Tel#", type: "tel", required: true, maxLength: 30 },
-      { name: "contact2Name", label: "2) Name:", type: "text", maxLength: 120 },
-      { name: "contact2Relationship", label: "Relationship:", type: "text", maxLength: 60 },
-      { name: "contact2Phone", label: "Tel#", type: "tel", maxLength: 30 },
-      { name: "physicianName", label: "Name of family Physician:", type: "text", maxLength: 120 },
-      { name: "physicianPhone", label: "Tel#", type: "tel", maxLength: 30 },
+      { name: "contact2Name", label: "2) Name:", type: "text", required: true, maxLength: 120, help: NA },
+      { name: "contact2Relationship", label: "Relationship:", type: "text", required: true, maxLength: 60, help: NA },
+      { name: "contact2Phone", label: "Tel#", type: "tel", required: true, maxLength: 30, help: NA },
+      { name: "physicianName", label: "Name of family Physician:", type: "text", required: true, maxLength: 120, help: NA },
+      { name: "physicianPhone", label: "Tel#", type: "tel", required: true, maxLength: 30, help: NA },
       { name: "h_medical", label: "MEDICAL INFORMATION", type: "heading" },
       { name: "n_medical", label: "Have you ever had or do you have?", type: "note" },
       yn("vision", "Vision Problem"),
@@ -252,98 +267,93 @@ export const TEMPLATES: FormTemplate[] = [
       yn("epilepsy", "Epilepsy/ Seizures"),
       yn("learning", "Learning Disorder"),
       yn("asthma", "Asthma"),
-      { name: "otherCondition", label: "Other (specify)", type: "text", maxLength: 200 },
-      { name: "conditionsExplain", label: "If you have answered yes to any of the above please explain", type: "textarea", maxLength: 2000 },
+      { name: "otherCondition", label: "Other (specify)", type: "text", required: true, maxLength: 200, help: NA },
+      { name: "conditionsExplain", label: "If you have answered yes to any of the above please explain", type: "textarea", maxLength: 2000, help: "Required if you answered Yes to any condition above.", requiredIf: anyYes(["vision", "bloodPressure", "hearing", "diabetes", "dizziness", "epilepsy", "learning", "asthma"]), requiredMessage: explainYes },
       yn("reaction", "Have you ever had or do you have a reaction to serum, drugs, or any medicines (aspirin/ penicillin)?"),
-      { name: "reactionExplain", label: "If yes please explain", type: "textarea", maxLength: 1000 },
+      { name: "reactionExplain", label: "If yes please explain", type: "textarea", maxLength: 1000, help: "Required if you answered Yes.", requiredIf: isYes("reaction"), requiredMessage: explainYes },
       yn("medicines", "Are you taking any medicines now?"),
-      { name: "medicinesExplain", label: "If yes explain", type: "textarea", maxLength: 1000 },
+      { name: "medicinesExplain", label: "If yes explain", type: "textarea", maxLength: 1000, help: "Required if you answered Yes.", requiredIf: isYes("medicines"), requiredMessage: explainYes },
       yn("infections", "Do you have any infections/ diseases?"),
-      { name: "infectionsExplain", label: "If yes explain", type: "textarea", maxLength: 1000 },
+      { name: "infectionsExplain", label: "If yes explain", type: "textarea", maxLength: 1000, help: "Required if you answered Yes.", requiredIf: isYes("infections"), requiredMessage: explainYes },
     ],
-    check: (d) => ({
-      ...explainIfYes(["vision", "bloodPressure", "hearing", "diabetes", "dizziness", "epilepsy", "learning", "asthma"], "conditionsExplain")(d),
-      ...explainIfYes(["reaction"], "reactionExplain")(d),
-      ...explainIfYes(["medicines"], "medicinesExplain")(d),
-      ...explainIfYes(["infections"], "infectionsExplain")(d),
-    }),
   },
   {
-    key: "workforce_registration", title: "Workforce New Jersey Customer Registration Form", version: 2, group: "COMMON", appliesTo: "ALL",
+    key: "workforce_registration", title: "Workforce New Jersey Customer Registration Form", version: 3, group: "COMMON", appliesTo: "ALL",
     containsFees: false, requiresSignature: true, pendingOfficialText: false,
     fields: [
       { name: "todaysDate", label: "1. Today's Date", type: "date", required: true },
       { name: "ssn", label: "2. Social Security Number", type: "ssn", required: true, prefill: "student_data.ssn" },
       { name: "dateOfBirth", label: "3. Date of Birth", type: "date", required: true, prefill: "student_data.dateOfBirth" },
-      { name: "gender", label: "4. Gender", type: "radio", options: ["Male", "Female"] },
+      { name: "gender", label: "4. Gender", type: "radio", required: true, options: ["Male", "Female"] },
       { name: "lastName", label: "Last Name", type: "text", required: true, maxLength: 80, prefill: "background_check.lastName" },
       { name: "firstName", label: "First Name", type: "text", required: true, maxLength: 80, prefill: "background_check.firstName" },
-      { name: "middleInitial", label: "Middle Initial", type: "text", maxLength: 2 },
+      { name: "middleInitial", label: "Middle Initial", type: "text", required: true, maxLength: 3, help: NA },
       { name: "street", label: "6. Street", type: "text", required: true, maxLength: 160, prefill: "student_data.street" },
       { name: "city", label: "7. City", type: "text", required: true, maxLength: 80, prefill: "student_data.city" },
       { name: "state", label: "8. State", type: "text", required: true, maxLength: 40, prefill: "student_data.state" },
       { name: "zip", label: "9. Zip", type: "text", required: true, maxLength: 10, prefill: "student_data.zip" },
-      { name: "county", label: "10. County", type: "text", maxLength: 60 },
+      { name: "county", label: "10. County", type: "text", required: true, maxLength: 60 },
       { name: "phone", label: "11. Phone Number", type: "tel", required: true, maxLength: 30, prefill: "student_data.cellPhone" },
-      { name: "altPhone", label: "12. Alternate Phone Number", type: "tel", maxLength: 30 },
-      { name: "fax", label: "13. Fax Number", type: "tel", maxLength: 30 },
-      { name: "email", label: "14. Email", type: "email", maxLength: 160, prefill: "email" },
+      { name: "altPhone", label: "12. Alternate Phone Number", type: "tel", required: true, maxLength: 30, help: NA },
+      { name: "fax", label: "13. Fax Number", type: "tel", required: true, maxLength: 30, help: NA },
+      { name: "email", label: "14. Email", type: "email", required: true, maxLength: 160, prefill: "email" },
       yn("usCitizen", "15. US Citizen?"),
-      { name: "alienReg", label: "Alien Reg. #", type: "text", maxLength: 40 },
-      { name: "alienExpiration", label: "Expiration Date", type: "date" },
+      { name: "alienReg", label: "Alien Reg. #", type: "text", maxLength: 40, help: "Required if you are not a US citizen.", requiredIf: (d) => d.usCitizen === "No" },
+      { name: "alienExpiration", label: "Expiration Date", type: "date", help: "Required if you are not a US citizen.", requiredIf: (d) => d.usCitizen === "No" },
       { name: "h_16", label: "16. What is your ethnic heritage?", type: "heading" },
-      yn("hispanic", "Are you Hispanic or Latino?", false),
-      { name: "race", label: "Please ✓ all that apply below:", type: "multi", options: ["White", "Black or African American", "Alaskan/American Indian", "Asian", "Hawaiian/Pacific Islander", "I choose not to respond"] },
+      yn("hispanic", "Are you Hispanic or Latino?"),
+      { name: "race", label: "Please ✓ all that apply below:", type: "multi", required: true, options: ["White", "Black or African American", "Alaskan/American Indian", "Asian", "Hawaiian/Pacific Islander", "I choose not to respond"] },
       {
         name: "schoolStatus", label: "17. School Status: (✓ One)", type: "radio", required: true,
         options: ["In-School, H.S. or Less", "In-School, Alternate School", "In-School Post H.S.", "Not Attending School; Did not finish High School", "Not Attending School; H.S. Graduate"],
       },
-      { name: "highestCompleted", label: "Highest number of years/degree completed:", type: "text", maxLength: 80 },
+      { name: "highestCompleted", label: "Highest number of years/degree completed:", type: "text", required: true, maxLength: 80 },
       { name: "employmentStatus", label: "18. Employment Status: (✓ One)", type: "radio", required: true, options: ["Employed", "Employed but received notice of termination", "Not Employed"] },
       { name: "h_19", label: "19. Job Bank Resume:", type: "heading" },
-      yn("jobBank", "Do you want your resume listed in America's Job Bank?", false),
-      { name: "confidential", label: "Do you want your personal information to remain confidential? (If yes, you must have a valid E-mail address)", type: "radio", options: YES_NO },
-      yn("migrant", "20. Are you a Migrant/Seasonal Worker?", false),
-      { name: "migrantClass", label: "If yes, ✓ class:", type: "radio", options: ["Migrant Farm Worker", "Migrant Food Proc. Worker", "Seasonal Farm Worker"] },
-      { name: "contactBy", label: "21. How do you want to be contacted? (✓ all that apply)", type: "multi", options: ["US Mail", "Primary Phone", "Alternate Phone", "Fax", "Email"] },
+      yn("jobBank", "Do you want your resume listed in America's Job Bank?"),
+      { name: "confidential", label: "Do you want your personal information to remain confidential? (If yes, you must have a valid E-mail address)", type: "radio", required: true, options: YES_NO },
+      yn("migrant", "20. Are you a Migrant/Seasonal Worker?"),
+      { name: "migrantClass", label: "If yes, ✓ class:", type: "radio", options: ["Migrant Farm Worker", "Migrant Food Proc. Worker", "Seasonal Farm Worker"], help: "Required if you are a migrant or seasonal worker.", requiredIf: isYes("migrant") },
+      { name: "contactBy", label: "21. How do you want to be contacted? (✓ all that apply)", type: "multi", required: true, options: ["US Mail", "Primary Phone", "Alternate Phone", "Fax", "Email"] },
       { name: "h_22", label: "22. Employment Preferences: (✓ all that apply)", type: "heading" },
-      { name: "desire", label: "Desire:", type: "multi", options: ["Full-time", "Part-time", "Permanent", "Temporary"] },
-      { name: "shift", label: "Shift:", type: "multi", options: ["Any", "1st", "2nd", "3rd", "Split", "Rotating"] },
-      { name: "minPay", label: "Minimum Desired Pay: $", type: "text", maxLength: 20 },
-      { name: "minPayPer", label: "per", type: "text", maxLength: 20 },
+      { name: "desire", label: "Desire:", type: "multi", required: true, options: ["Full-time", "Part-time", "Permanent", "Temporary"] },
+      { name: "shift", label: "Shift:", type: "multi", required: true, options: ["Any", "1st", "2nd", "3rd", "Split", "Rotating"] },
+      { name: "minPay", label: "Minimum Desired Pay: $", type: "text", required: true, maxLength: 20 },
+      { name: "minPayPer", label: "per", type: "text", required: true, maxLength: 20 },
       { name: "h_23", label: "23.", type: "heading" },
-      { name: "militaryBranch", label: "Military Service: Branch:", type: "text", maxLength: 80 },
+      yn("veteran", "Have you served in the military?"),
+      { name: "militaryBranch", label: "Military Service: Branch:", type: "text", maxLength: 80, help: "Required if you served in the military.", requiredIf: isYes("veteran") },
       { name: "campaignVeteran", label: "Campaign Veteran", type: "checkbox" },
-      { name: "activeFrom", label: "Active Service from:", type: "date" },
-      { name: "activeTo", label: "to", type: "date" },
-      { name: "serviceDisability", label: "Service Disability:", type: "radio", options: ["Disabled", "Not Disabled", "Special"] },
+      { name: "activeFrom", label: "Active Service from:", type: "date", help: "Required if you served in the military.", requiredIf: isYes("veteran") },
+      { name: "activeTo", label: "to", type: "date", help: "Required if you served in the military.", requiredIf: isYes("veteran") },
+      { name: "serviceDisability", label: "Service Disability:", type: "radio", options: ["Disabled", "Not Disabled", "Special"], help: "Required if you served in the military.", requiredIf: isYes("veteran") },
       { name: "h_24", label: "24. Severance Pay (from most recent employment):", type: "heading" },
-      { name: "severanceAmount", label: "Estimated Amount Received: $ (last 6 months)", type: "text", maxLength: 20 },
-      { name: "severanceType", label: "Severance", type: "radio", options: ["Lump Sum pay", "Installment Pay", "No information at this time"] },
-      { name: "lumpSumDate", label: "Lump Sum pay: Date Received:", type: "date" },
-      { name: "installmentStart", label: "Installment Pay: Start Date:", type: "date" },
-      { name: "jobObjective", label: "25. Job Objective:", type: "text", maxLength: 300 },
-      yn("interestedTraining", "26. Are you interested in training:", false),
-      { name: "travel", label: "27. How far are you willing to travel for work:", type: "radio", options: ["5 Miles", "10 Miles", "25 Miles", "50 Miles", "100 miles"] },
+      { name: "severanceAmount", label: "Estimated Amount Received: $ (last 6 months)", type: "text", maxLength: 20, help: "Required if you receive severance pay.", requiredIf: (d) => d.severanceType === "Lump Sum pay" || d.severanceType === "Installment Pay" },
+      { name: "severanceType", label: "Severance", type: "radio", required: true, options: ["Lump Sum pay", "Installment Pay", "No information at this time"] },
+      { name: "lumpSumDate", label: "Lump Sum pay: Date Received:", type: "date", help: "Required for lump sum pay.", requiredIf: (d) => d.severanceType === "Lump Sum pay" },
+      { name: "installmentStart", label: "Installment Pay: Start Date:", type: "date", help: "Required for installment pay.", requiredIf: (d) => d.severanceType === "Installment Pay" },
+      { name: "jobObjective", label: "25. Job Objective:", type: "text", required: true, maxLength: 300 },
+      yn("interestedTraining", "26. Are you interested in training:"),
+      { name: "travel", label: "27. How far are you willing to travel for work:", type: "radio", required: true, options: ["5 Miles", "10 Miles", "25 Miles", "50 Miles", "100 miles"] },
       { name: "h_28", label: "28. Work History (current/last employer):", type: "heading" },
-      { name: "jobTitle", label: "Job Title:", type: "text", maxLength: 120 },
-      { name: "employer", label: "Employer:", type: "text", maxLength: 160 },
-      { name: "workStreet", label: "Street:", type: "text", maxLength: 160 },
-      { name: "workCity", label: "City:", type: "text", maxLength: 80 },
-      { name: "workState", label: "State:", type: "text", maxLength: 40 },
-      { name: "workStart", label: "Start Date:", type: "date" },
-      { name: "workEnd", label: "End Date:", type: "date" },
-      { name: "wage", label: "Wage $", type: "text", maxLength: 20 },
-      { name: "wagePer", label: "per", type: "text", maxLength: 20 },
-      { name: "leaveReason", label: "Reason for Leaving:", type: "radio", options: ["Lack of Work/Lay Off", "Plant/Dept. Closure", "Other (Specify)"] },
-      { name: "leaveOther", label: "Other (Specify)", type: "text", maxLength: 200 },
-      { name: "jobDuties", label: "Job Duties:", type: "textarea", maxLength: 1000 },
-      { name: "additionalSkills", label: "29. Additional Skills:", type: "textarea", maxLength: 1000 },
-      { name: "license", label: "30. Driver's License:", type: "multi", options: ["None", "Car", "Motorcycle", "CDL-A", "CDL-B", "CDL-C"] },
-      { name: "licenseState", label: "State:", type: "text", maxLength: 40 },
+      yn("hasWorked", "Do you have a current or previous employer?"),
+      { name: "jobTitle", label: "Job Title:", type: "text", maxLength: 120, help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "employer", label: "Employer:", type: "text", maxLength: 160, help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "workStreet", label: "Street:", type: "text", maxLength: 160, help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "workCity", label: "City:", type: "text", maxLength: 80, help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "workState", label: "State:", type: "text", maxLength: 40, help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "workStart", label: "Start Date:", type: "date", help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "workEnd", label: "End Date:", type: "date", help: "Required if you no longer work there.", requiredIf: (d) => d.hasWorked === "Yes" && d.employmentStatus !== "Employed" },
+      { name: "wage", label: "Wage $", type: "text", maxLength: 20, help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "wagePer", label: "per", type: "text", maxLength: 20, help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "leaveReason", label: "Reason for Leaving:", type: "radio", options: ["Lack of Work/Lay Off", "Plant/Dept. Closure", "Other (Specify)"], help: "Required if you no longer work there.", requiredIf: (d) => d.hasWorked === "Yes" && d.employmentStatus !== "Employed" },
+      { name: "leaveOther", label: "Other (Specify)", type: "text", maxLength: 200, help: "Required if the reason is Other.", requiredIf: (d) => d.leaveReason === "Other (Specify)", requiredMessage: "Please specify the reason" },
+      { name: "jobDuties", label: "Job Duties:", type: "textarea", maxLength: 1000, help: "Required if you have a current or previous employer.", requiredIf: isYes("hasWorked") },
+      { name: "additionalSkills", label: "29. Additional Skills:", type: "textarea", required: true, maxLength: 1000 },
+      { name: "license", label: "30. Driver's License:", type: "multi", required: true, options: ["None", "Car", "Motorcycle", "CDL-A", "CDL-B", "CDL-C"] },
+      { name: "licenseState", label: "State:", type: "text", maxLength: 40, help: "Required if you have a license.", requiredIf: (d) => Array.isArray(d.license) && d.license.some((l) => l !== "None") },
       { name: "n_31", label: "31. I certify that the above information is true and correct to the best of my knowledge", type: "note" },
     ],
-    check: (d): Record<string, string> => (d.leaveReason === "Other (Specify)" && !String(d.leaveOther ?? "").trim() ? { leaveOther: "Please specify the reason" } : {}),
   },
   {
     key: "grievance_policy", title: "Grievance Policy and Procedures", version: 2, group: "COMMON", appliesTo: "ALL",
@@ -444,7 +454,7 @@ export const TEMPLATES: FormTemplate[] = [
   // ----- Non-Private Forms -----
   {
     // Wording and layout from the HCDFS enrollment packet (BHI's new design), October 2026.
-    key: "personal_information", title: "Personal Information", version: 1, group: "NON_PRIVATE", appliesTo: ["DFS"],
+    key: "personal_information", title: "Personal Information", version: 2, group: "NON_PRIVATE", appliesTo: ["DFS"],
     containsFees: false, requiresSignature: false, pendingOfficialText: false,
     fields: [
       { name: "firstName", label: "First Name", type: "text", required: true, maxLength: 80, prefill: "background_check.firstName" },
@@ -453,12 +463,12 @@ export const TEMPLATES: FormTemplate[] = [
       { name: "dateOfBirth", label: "Student Date of Birth (DOB)", type: "date", required: true, prefill: "student_data.dateOfBirth" },
       { name: "gender", label: "Gender", type: "radio", required: true, options: ["Male", "Female", "Non-Binary"], prefill: "workforce_registration.gender" },
       { name: "address1", label: "Student Address 1", type: "text", required: true, maxLength: 160, prefill: "student_data.street" },
-      { name: "address2", label: "Student Address 2", type: "text", maxLength: 160 },
+      { name: "address2", label: "Student Address 2", type: "text", required: true, maxLength: 160, help: NA },
       { name: "city", label: "Student City", type: "text", required: true, maxLength: 80, prefill: "student_data.city" },
       { name: "state", label: "Student State", type: "text", required: true, maxLength: 40, prefill: "student_data.state" },
       { name: "zip", label: "Student ZIP Code", type: "text", required: true, maxLength: 10, prefill: "student_data.zip" },
-      { name: "county", label: "Student County", type: "text", maxLength: 60, prefill: "workforce_registration.county" },
-      { name: "stateId", label: "Driver\u2019s License / State ID", type: "text", maxLength: 40 },
+      { name: "county", label: "Student County", type: "text", required: true, maxLength: 60, prefill: "workforce_registration.county", help: NA },
+      { name: "stateId", label: "Driver\u2019s License / State ID", type: "text", required: true, maxLength: 40, help: NA },
       { name: "h_official", label: "Official Use Only", type: "heading" },
       { name: "n_official", label: "Program, credential and dates are filled in by BHI from your enrollment. Please answer the questions below.", type: "note" },
       { name: "ethnicity", label: "Student Ethnicity", type: "radio", required: true, options: ["Hispanic", "Non-Hispanic", "Do Not Want to Disclose"] },
@@ -522,15 +532,14 @@ export function schemaFor(t: FormTemplate) {
     if (!isInput(f)) continue;
     if (f.type === "checkbox") {
       shape[f.name] = f.required
-        ? z.boolean().refine((v) => v === true, "Please confirm to continue")
-        : z.boolean().default(false);
+        ? z.preprocess((v) => v ?? false, z.boolean()).refine((v) => v === true, "Please confirm to continue")
+        : z.preprocess((v) => v ?? false, z.boolean());
       continue;
     }
     if (f.type === "multi") {
       const opts = f.options ?? [];
       shape[f.name] = z
-        .array(z.string())
-        .default([])
+        .preprocess((v) => (v == null ? [] : typeof v === "string" ? [v] : v), z.array(z.string()))
         .superRefine((v, ctx) => {
           if (v.some((x) => !opts.includes(x))) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Choose from the options" });
           if (f.required && v.length === 0) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Choose at least one" });
@@ -538,7 +547,10 @@ export function schemaFor(t: FormTemplate) {
       continue;
     }
     const max = f.type === "ssn" ? 11 : f.maxLength ?? 500;
-    let field: z.ZodTypeAny = z
+    // An unanswered question (no radio picked) arrives as undefined: treat it as empty, so its
+    // "required" message shows together with every other missing answer, including the
+    // "required if ..." ones checked across fields below.
+    const text = z
       .string()
       .trim()
       .max(max, `Use at most ${max} characters`)
@@ -556,17 +568,27 @@ export function schemaFor(t: FormTemplate) {
         if (f.type === "ssn" && !/^\d{3}-?\d{2}-?\d{4}$/.test(v))
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Enter 9 digits, e.g. 123-45-6789" });
       });
-    // Store Social Security numbers in one format (123-45-6789).
-    if (f.type === "ssn") field = field.transform((v: string) => (v ? v.replace(/\D/g, "").replace(/^(\d{3})(\d{2})(\d{4})$/, "$1-$2-$3") : v));
-    shape[f.name] = field;
+    // Social Security numbers are stored in one format (123-45-6789). Done before validation, not as
+    // a .transform(): a transform makes zod skip the cross-field checks whenever any answer is missing.
+    const ssn = (v: string) => (/^\s*\d{3}-?\d{2}-?\d{4}\s*$/.test(v) ? v.replace(/\D/g, "").replace(/^(\d{3})(\d{2})(\d{4})$/, "$1-$2-$3") : v);
+    shape[f.name] = z.preprocess((v) => (v == null ? "" : f.type === "ssn" && typeof v === "string" ? ssn(v) : v), text);
   }
   const obj = z.object(shape).strip();
-  if (!t.check) return obj;
+  const conditional = t.fields.filter((f) => f.requiredIf);
   const check = t.check;
+  if (!check && !conditional.length) return obj;
   return obj.superRefine((data, ctx) => {
-    for (const [path, message] of Object.entries(check(data as Record<string, unknown>))) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [path], message });
+    const d = data as Record<string, unknown>;
+    for (const f of conditional) {
+      if (!f.requiredIf!(d) || !isEmptyAnswer(d[f.name])) continue;
+      const message = f.requiredMessage ?? (f.type === "radio" || f.type === "select" ? "Choose one of the options" : f.type === "multi" ? "Choose at least one" : "This field is required");
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [f.name], message });
+    }
+    if (check) for (const [path, message] of Object.entries(check(d))) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [path], message });
   });
 }
+
+export const isEmptyAnswer = (v: unknown) => v == null || (typeof v === "string" && !v.trim()) || (Array.isArray(v) && v.length === 0);
 
 /** Raw answers from a submitted form (lists for "check all that apply"). */
 export function rawFromForm(t: FormTemplate, fd: FormData): Record<string, FormDataEntryValue | FormDataEntryValue[] | undefined> {

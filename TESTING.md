@@ -48,3 +48,9 @@ Use a staging site with Stripe **test** keys and real email. Tick each line. Str
 - [ ] Approve a test application. In the approval email, the "Open my dashboard" link starts with the public address (not `localhost`, `192.168…` or a machine name).
 - [ ] Open that link on a phone that is **not** on the office network, signed out: it shows Sign in; after signing in you land on the dashboard (not "Page not found").
 - [ ] Private student: pay with a Stripe test card; Stripe returns you to `/application/paid` on the public address.
+
+## Every form is complete
+- [ ] Open the WorkForce NJ form as a student and press Save leaving everything empty: every question shows an error at once (including County, Race, How to be contacted, Employment preferences, Job objective, Training, Travel, Skills, Driver's license).
+- [ ] Answer "US Citizen: No": Alien Reg. # and Expiration become required. "Have you served in the military: Yes": branch, dates, disability required. "Current or previous employer: Yes": work history required.
+- [ ] Complete and sign the form, then Print: no empty box; questions that don't apply say N/A.
+- [ ] Same check on Student Data, Educational Background, Background Check, Emergency Medical and (DFS) Personal Information.

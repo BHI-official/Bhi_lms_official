@@ -1,3 +1,36 @@
+# Every form must be filled in completely — 6 November 2026 (follow-up)
+
+Mahek's printed WorkForce NJ registration had many blank boxes. The printing was right (every box is
+mapped); the blanks were questions the LMS let students skip: 47 answers across the forms were optional.
+
+- **Every answer on every form is now required.** Questions that only apply to some students are
+  required whenever they apply (`requiredIf` on a field), for example:
+  - WorkForce NJ: Alien Reg. # and expiration if not a US citizen; class if a migrant/seasonal worker;
+    military branch, dates and disability if they served (new question "Have you served in the
+    military?"); amount and date for lump-sum or installment severance; the work-history block if they
+    have a current or previous employer (new question), with end date and reason for leaving only if
+    they no longer work there; license state if they have a license.
+  - Educational Background: the college block if they attended college (new question).
+  - Background Check / Emergency Medical: the "please explain" boxes after a Yes.
+  - Answers some students simply don't have (fax, alternate/home/work phone, middle name, a second
+    emergency contact, family physician, social media, T.A.B.E. scores, Address 2, State ID) are
+    required with the hint "Write N/A if this doesn't apply to you."
+  - The only answer that may stay empty is the free "questions or comments" box.
+- **Printed forms leave no blanks:** on a completed form, a question that doesn't apply prints "N/A"
+  (and a current job's end date prints "Present"). Drafts and blank forms print as they are.
+- All missing answers are listed at once: unanswered questions no longer stop the "required if"
+  checks from running (an SSN `.transform()` made zod skip them), and radio / check-all questions
+  now show their hint text.
+- A unit test fails if any form gets an answer that can be left empty; another replays Mahek's
+  registration and checks every blank is now required. `npm run forms:samples` refuses incomplete samples.
+- Form versions bumped (Student Data, Educational Background, Background Check, Emergency Medical,
+  WorkForce NJ → 3; Personal Information → 2).
+
+**Existing students:** completeness is re-checked against the current rules, so applications with
+blanks now show "Incomplete: Complete "<form>"" on the admin application page. Unsubmitted students
+see the forms as not complete and must fill the blanks; for submitted ones, use **Request corrections**
+so the student can complete them (editing a signed form asks them to sign again).
+
 # Mahek's feedback — 6 November 2026
 
 Base: `7ef350a`. Three commits, one per item (`git log 7ef350a..HEAD`).

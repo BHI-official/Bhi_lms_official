@@ -336,7 +336,7 @@ test("every form carries the official wording (the Non-Private agreement came wi
 
 test("Yes answers on the Background Check need an explanation", () => {
   const t = TEMPLATES.find((x) => x.key === "background_check")!;
-  const base = { firstName: "Ana", lastName: "Diaz", street: "1 Main St", city: "Jersey City", state: "NJ", zip: "07306", dateOfBirth: "1990-01-01", ssn: "123456789", arrested: "No", abuse: "No", lifestyle: "No" };
+  const base = { firstName: "Ana", lastName: "Diaz", street: "1 Main St", city: "Jersey City", state: "NJ", zip: "07306", dateOfBirth: "1990-01-01", ssn: "123456789", arrested: "No", abuse: "No", lifestyle: "No", middleName: "N/A", otherNames: "N/A", expungement: "N/A" };
   const ok = schemaFor(t).safeParse(coerceRaw(t, base));
   assert.ok(ok.success);
   assert.equal((ok as { data: Record<string, unknown> }).data.ssn, "123-45-6789", "SSNs are stored in one format");

@@ -146,7 +146,7 @@ export function Checkbox({ name, label, defaultChecked, required }: { name: stri
 }
 
 /** One choice from a short list, shown as buttons that are easy to tap (Yes / No and similar). */
-export function RadioGroup({ name, label, options, defaultValue, required }: { name: string; label: string; options: string[]; defaultValue?: string; required?: boolean }) {
+export function RadioGroup({ name, label, options, defaultValue, required, help }: { name: string; label: string; help?: string; options: string[]; defaultValue?: string; required?: boolean }) {
   const { state } = useFormCtx();
   const err = state.fieldErrors?.[name];
   return (
@@ -160,13 +160,13 @@ export function RadioGroup({ name, label, options, defaultValue, required }: { n
           </label>
         ))}
       </div>
-      {err && <p className="mt-1 text-xs font-medium text-brick-600">{err}</p>}
+      {err ? <p className="mt-1 text-xs font-medium text-brick-600">{err}</p> : help && <p className="mt-1 text-xs text-slate-500">{help}</p>}
     </fieldset>
   );
 }
 
 /** "Check all that apply". */
-export function CheckGroup({ name, label, options, defaultValue, required }: { name: string; label: string; options: string[]; defaultValue?: string[]; required?: boolean }) {
+export function CheckGroup({ name, label, options, defaultValue, required, help }: { name: string; label: string; help?: string; options: string[]; defaultValue?: string[]; required?: boolean }) {
   const { state } = useFormCtx();
   const err = state.fieldErrors?.[name];
   return (
@@ -180,7 +180,7 @@ export function CheckGroup({ name, label, options, defaultValue, required }: { n
           </label>
         ))}
       </div>
-      {err && <p className="mt-1 text-xs font-medium text-brick-600">{err}</p>}
+      {err ? <p className="mt-1 text-xs font-medium text-brick-600">{err}</p> : help && <p className="mt-1 text-xs text-slate-500">{help}</p>}
     </fieldset>
   );
 }
