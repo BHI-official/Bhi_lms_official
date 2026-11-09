@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { banners, site, siteUrl } from "@/lib/site";
-
+// @ts-expect-error Next.js resolves global CSS imports during the build.
+import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
