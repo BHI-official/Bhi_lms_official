@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
@@ -9,6 +11,12 @@ import { audit } from "@/lib/audit";
 import { Alert, Card, PageHeader } from "@/components/ui";
 import { FormStep } from "@/app/enroll/forms/[key]/form-step";
 import { adminSaveFormAction } from "@/app/admin/actions";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Application form",
+  description: "One enrollment form from a student application, with its answers and signatures.",
+  banner: "admin",
+});
 
 /** Admin edits a student's form answers. Audited with before/after; the student's signature stays on record. */
 export default async function AdminEditForm({ params }: { params: Promise<{ id: string; key: string }> }) {

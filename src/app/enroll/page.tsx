@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cols } from "@/db";
@@ -9,7 +10,11 @@ import { Alert, Card, LinkButton, PageHeader } from "@/components/ui";
 import { CategoryForm } from "./category-form";
 import { EnrollNav } from "./enroll-nav";
 
-export const metadata: Metadata = { title: "Enrollment" };
+export const metadata: Metadata = pageMetadata({
+  title: "Enrollment",
+  description: "Choose your enrollment type to start your Bright Horizon Institute application.",
+  banner: "student",
+});
 export const dynamic = "force-dynamic";
 
 export default async function EnrollPage() {

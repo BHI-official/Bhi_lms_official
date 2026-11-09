@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
@@ -10,6 +12,12 @@ import { Alert, PageHeader, fmtDate } from "@/components/ui";
 import { ReportForm } from "./report-form";
 import { saveReportAction } from "@/app/instructor/actions";
 import { thisMonthLocal } from "@/lib/dates";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Monthly progress report",
+  description: "Write the monthly progress report for one of your students.",
+  banner: "instructor",
+});
 
 export default async function ReportPage({ params }: { params: Promise<{ enrollmentId: string; month: string }> }) {
   const user = await requireInstructor();

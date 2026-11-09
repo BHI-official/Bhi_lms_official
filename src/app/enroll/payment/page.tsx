@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -11,7 +12,11 @@ import { ActionButton } from "@/components/action-widgets";
 import { Alert, Card, PageHeader } from "@/components/ui";
 import { EnrollNav } from "../enroll-nav";
 
-export const metadata: Metadata = { title: "Tuition payment" };
+export const metadata: Metadata = pageMetadata({
+  title: "Tuition payment",
+  description: "Pay your course tuition and fees securely online.",
+  banner: "student",
+});
 export const dynamic = "force-dynamic";
 
 /**

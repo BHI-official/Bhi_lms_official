@@ -1,8 +1,15 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { InstructorRegisterForm } from "./instructor-form";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Instructor sign-up" };
+export const metadata: Metadata = pageMetadata({
+  title: "Instructor sign-up",
+  description: "Instructors at Bright Horizon Institute sign up here. After an admin approves your account, you can see your courses, take attendance and write monthly progress reports.",
+  path: "/register/instructor",
+  banner: "instructorSignup",
+  index: true,
+});
 
 export default function InstructorRegisterPage() {
   return (

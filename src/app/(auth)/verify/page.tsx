@@ -4,8 +4,13 @@ import { getSessionUser } from "@/lib/session";
 import { homePath } from "@/lib/auth";
 import { VerifyForms } from "./verify-forms";
 import { logoutAction } from "../actions";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Verify your email" };
+export const metadata: Metadata = pageMetadata({
+  title: "Verify your email",
+  description: "Confirm your email address with the 6-digit code we sent, then continue to your Bright Horizon Institute enrollment.",
+  banner: "register",
+});
 export const dynamic = "force-dynamic";
 
 export default async function VerifyPage() {

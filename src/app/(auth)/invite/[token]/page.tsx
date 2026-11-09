@@ -4,8 +4,16 @@ import { cols } from "@/db";
 import { inviteHash, isWellFormedToken } from "@/lib/invite";
 import { Alert } from "@/components/ui";
 import { InviteForm } from "./invite-form";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Activate your instructor account", referrer: "no-referrer" };
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Activate your instructor account",
+    description: "Finish setting up the Bright Horizon Institute instructor account you were invited to.",
+    banner: "instructorSignup",
+  }),
+  referrer: "no-referrer",
+};
 
 export default async function InvitePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;

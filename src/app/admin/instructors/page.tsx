@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cols, type User } from "@/db";
@@ -6,7 +7,11 @@ import { ActionButton, AddInstructorForm } from "@/components/action-widgets";
 import { Badge, Card, Empty, PageHeader, StatusBadge, Table, Td, fmtDate } from "@/components/ui";
 import { createInstructorAction, decideInstructorAction, resendInviteAction } from "../actions";
 
-export const metadata: Metadata = { title: "Instructors" };
+export const metadata: Metadata = pageMetadata({
+  title: "Instructors",
+  description: "Approve instructors and assign them to courses and classes.",
+  banner: "admin",
+});
 
 function AccountStatus({ i }: { i: User }) {
   if (i.disabledAt) return <Badge tone="brick">Disabled</Badge>;

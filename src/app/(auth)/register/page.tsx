@@ -2,8 +2,15 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { env } from "@/lib/env";
 import { RegisterForm } from "./register-form";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Create a student account" };
+export const metadata: Metadata = pageMetadata({
+  title: "Apply online: create a student account",
+  description: "Start your Bright Horizon Institute enrollment online. Create a student account, choose your course, complete your forms and documents, and submit your application from any device.",
+  path: "/register",
+  banner: "register",
+  index: true,
+});
 
 export default function RegisterPage() {
   return (

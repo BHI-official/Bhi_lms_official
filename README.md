@@ -72,6 +72,20 @@ Admins sign in with the printed one-time password, then use **Forgot password** 
 
 Without `RESEND_API_KEY` in development, emails (including OTP codes) are printed to the server console.
 
+## SEO, favicon and link previews
+
+Everything search engines and link previews read is set in **`src/lib/site.ts`** (name, description, address, phone, keywords, banner paths). Change it there; pages, `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` and the structured data all follow.
+
+- **Site address:** set `NEXT_PUBLIC_SITE_URL` (or `APP_URL`) to the live address, e.g. `https://lms.brighthorizoninstitute.com`. Canonical links, Open Graph images and the sitemap use it. A localhost value is ignored in production.
+- **What gets indexed:** only `/login`, `/register` and `/register/instructor`. Every other page (admin, instructor, student dashboard, enrollment, application, verify, invite, password reset) sends `noindex, nofollow`, both as a `<meta name="robots">` tag and an `X-Robots-Tag` header, and is disallowed in robots.txt. New pages are private by default: a page has to opt in with `pageMetadata({ ..., index: true })`.
+- **Every page** has its own title (`<page> | Bright Horizon Institute`), description, Open Graph and Twitter card. Pages whose URL holds a private id get no canonical URL.
+- **Structured data:** the sign-in and sign-up pages include schema.org JSON-LD (`EducationalOrganization` with the course list from `data/bhi-courses.json`, and `WebSite`).
+- **Favicon and app icons** (`public/favicon.ico`, `public/icons/`, `public/apple-touch-icon.png`) are made from the official white BHI logo on BHI pine green, so the icon shows on light and dark browser tabs. Maskable icons are included for Android home screens.
+- **Social banners** (1200x630) in `public/og/`: default, sign in, student sign-up, instructor sign-up, password reset, student portal, instructor portal, staff portal, plus a 1200x600 Twitter/X variant.
+- **Regenerating assets:** `python3 scripts/seo_icons.py` and `python3 scripts/seo_banners.py` from the repo root (needs Pillow). Source logo: `assets/brand/bhi-logo-white-source.png`. Banner text is at the bottom of `scripts/seo_banners.py`.
+
+After deploying, submit `https://<your site>/sitemap.xml` in Google Search Console and check a link preview with the Facebook Sharing Debugger or LinkedIn Post Inspector.
+
 ## Deploying
 
 - Any Node host works (Vercel, Render, Railway, a VPS). Use MongoDB Atlas (or another managed MongoDB) with backups turned on, and allow your host's IPs in Atlas Network Access.

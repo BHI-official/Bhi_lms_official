@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { getClassWithCourse } from "@/lib/queries";
 import { PageHeader } from "@/components/ui";
 import { DayAttendance } from "@/components/day-attendance";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Class attendance",
+  description: "Attendance for every student in this class.",
+  banner: "admin",
+});
 
 export const dynamic = "force-dynamic";
 

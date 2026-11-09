@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
@@ -7,6 +9,12 @@ import { ActionButton, ClassForm, CourseForm } from "@/components/action-widgets
 import { CourseInstructorForm } from "@/components/admin-app-edit";
 import { Badge, Card, Empty, PageHeader, Table, Td, fmtDate } from "@/components/ui";
 import { archiveCourseAction, assignInstructorToCourseAction, removeCourseAssignmentAction, saveClassAction, saveCourseAction } from "../../actions";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Course details",
+  description: "Course settings, fees and the classes that run this course.",
+  banner: "admin",
+});
 
 export default async function CoursePage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();

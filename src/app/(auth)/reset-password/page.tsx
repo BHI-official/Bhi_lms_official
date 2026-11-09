@@ -1,8 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ResetForm } from "./reset-form";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Enter your reset code" };
+export const metadata: Metadata = pageMetadata({
+  title: "Enter your reset code",
+  description: "Enter the 6-digit code we emailed you and choose a new password for your Bright Horizon Institute account.",
+  banner: "password",
+});
 
 export default async function ResetPasswordPage({ searchParams }: { searchParams: Promise<{ email?: string }> }) {
   const { email = "" } = await searchParams;

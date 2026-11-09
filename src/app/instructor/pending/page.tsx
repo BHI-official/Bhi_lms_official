@@ -1,9 +1,14 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 
-export const metadata: Metadata = { title: "Waiting for approval" };
+export const metadata: Metadata = pageMetadata({
+  title: "Waiting for approval",
+  description: "Your instructor account is waiting for a BHI admin to approve it.",
+  banner: "instructor",
+});
 export const dynamic = "force-dynamic";
 
 export default async function InstructorPending() {

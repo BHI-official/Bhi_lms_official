@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import { AttendanceTabs } from "@/components/attendance-tabs";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -7,7 +8,11 @@ import { coursesById, usersById } from "@/lib/queries";
 import { Badge, Empty, PageHeader, Table, Td } from "@/components/ui";
 import { thisMonthLocal } from "@/lib/dates";
 
-export const metadata: Metadata = { title: "Progress reports" };
+export const metadata: Metadata = pageMetadata({
+  title: "Progress reports",
+  description: "Monthly progress reports written by instructors.",
+  banner: "admin",
+});
 
 export default async function AdminReports({ searchParams }: { searchParams: Promise<{ month?: string }> }) {
   await requireAdmin();

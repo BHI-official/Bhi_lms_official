@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { requireInstructor } from "@/lib/auth";
 import { SheetView, loadEnrollmentFor } from "@/components/sheet-view";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Attendance sheet",
+  description: "The attendance sheet for one of your students.",
+  banner: "instructor",
+});
 
 export const dynamic = "force-dynamic";
 

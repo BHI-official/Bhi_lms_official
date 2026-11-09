@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cols } from "@/db";
@@ -9,6 +11,12 @@ import { todayLocal } from "@/lib/dates";
 import { StudentShell } from "@/components/student-shell";
 import { AttendanceTable } from "@/components/attendance-table";
 import { PageHeader } from "@/components/ui";
+
+export const metadata: Metadata = pageMetadata({
+  title: "My class",
+  description: "Class details, schedule and check-in.",
+  banner: "student",
+});
 
 export const dynamic = "force-dynamic";
 

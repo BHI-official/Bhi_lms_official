@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
@@ -10,6 +12,12 @@ import {
   assignClassToInstructorAction, assignCourseToInstructorAction, decideInstructorAction, removeCourseAssignmentAction, removeInstructorAction, setAccountDisabledAction,
 } from "../../actions";
 import { thisMonthLocal } from "@/lib/dates";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Instructor details",
+  description: "An instructor account with its course and class assignments.",
+  banner: "admin",
+});
 
 export default async function InstructorDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ month?: string }> }) {
   await requireAdmin();

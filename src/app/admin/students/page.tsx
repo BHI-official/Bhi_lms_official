@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { Filter } from "mongodb";
@@ -9,7 +10,11 @@ import { AssignClassForm } from "@/components/action-widgets";
 import { Empty, PageHeader, Table, Td, cx } from "@/components/ui";
 import { assignStudentAction } from "../actions";
 
-export const metadata: Metadata = { title: "Students" };
+export const metadata: Metadata = pageMetadata({
+  title: "Students",
+  description: "All registered students, their enrollment status and classes.",
+  banner: "admin",
+});
 
 export default async function StudentsPage({ searchParams }: { searchParams: Promise<{ filter?: string; q?: string; course?: string; category?: string; county?: string }> }) {
   await requireAdmin();

@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
@@ -9,6 +11,12 @@ import { localDateOf, timeLocal, todayLocal, thisMonthLocal } from "@/lib/dates"
 import { ClassSettingsForm } from "@/components/class-settings-form";
 import { saveClassSettingsAction, sendClassroomLinkAction } from "@/lib/actions/class-settings";
 import { minutesOf, hoursFromMinutes } from "@/lib/attendance-math";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Class",
+  description: "Your class roster, attendance sheets and monthly progress reports.",
+  banner: "instructor",
+});
 
 export default async function InstructorClass({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ month?: string }> }) {
   const user = await requireInstructor();

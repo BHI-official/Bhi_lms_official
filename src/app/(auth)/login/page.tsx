@@ -4,8 +4,15 @@ import { ActionForm, Field, Submit } from "@/components/forms";
 import { Alert } from "@/components/ui";
 import { loginAction } from "../actions";
 import { safeNextPath } from "@/lib/routing";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = pageMetadata({
+  title: "Sign in",
+  description: "Sign in to the Bright Horizon Institute learning portal. Students, instructors and staff use the same sign-in to reach enrollment, classes, attendance and progress reports.",
+  path: "/login",
+  banner: "login",
+  index: true,
+});
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ reset?: string; next?: string }> }) {
   const { reset, next } = await searchParams;

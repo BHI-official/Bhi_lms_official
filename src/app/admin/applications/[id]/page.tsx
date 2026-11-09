@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
@@ -18,6 +20,12 @@ import {
   adminSetCourseAction, adminSetSelectionAction, approveApplicationAction, cancelPaymentRequestAction, rejectApplicationAction, reopenApplicationAction, requestCorrectionsAction,
   setPaymentStatusAction,
 } from "../../actions";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Application details",
+  description: "A student application with its forms, documents, payment and decision history.",
+  banner: "admin",
+});
 
 export default async function ApplicationDetail({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();

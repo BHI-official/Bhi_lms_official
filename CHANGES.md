@@ -1,3 +1,19 @@
+# SEO, favicon and social banners — 9 November 2026
+
+- **Favicon and app icons** from the official BHI logo (white logo on pine green): `favicon.ico`
+  (16–256 px), PNG favicons, Apple touch icon, Android/PWA icons including maskable ones, and a
+  web app manifest.
+- **Every page has its own title and description**, plus Open Graph and Twitter cards with a matching
+  1200x630 banner (`public/og/`). Titles now read "Page | Bright Horizon Institute".
+- **Search engines:** sign in, student sign-up and instructor sign-up can be indexed (canonical URLs,
+  `/sitemap.xml`, schema.org JSON-LD for Bright Horizon Institute and its courses). Every page behind a
+  login stays out of search (`noindex` meta tag, `X-Robots-Tag` header, robots.txt). New pages are
+  private unless they opt in.
+- The sign-in and sign-up pages show the BHI logo (sidebar on desktop, small badge on phones).
+- Forgot password: the form moved to `forgot-form.tsx` so the page can set its own metadata.
+- New setting: `NEXT_PUBLIC_SITE_URL` (optional; falls back to `APP_URL`). See README, "SEO, favicon and
+  link previews".
+
 # Every form must be filled in completely — 6 November 2026 (follow-up)
 
 Mahek's printed WorkForce NJ registration had many blank boxes. The printing was right (every box is

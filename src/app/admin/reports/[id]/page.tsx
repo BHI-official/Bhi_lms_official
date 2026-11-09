@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
@@ -7,6 +9,12 @@ import { ActionButton } from "@/components/action-widgets";
 import { ReportView } from "@/components/report-view";
 import { Badge, PageHeader, fmtDate, fmtDateTime } from "@/components/ui";
 import { reopenReportAction } from "../../actions";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Progress report",
+  description: "One monthly progress report.",
+  banner: "admin",
+});
 
 export default async function AdminReportPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();

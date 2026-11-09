@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 
-export const metadata = { title: "Admin guide | BHI LMS" };
+export const metadata: Metadata = pageMetadata({
+  title: "Admin guide",
+  description: "Step-by-step setup and daily tasks for BHI LMS administrators.",
+  banner: "admin",
+});
 
 /**
  * Fill these in with your real admin paths. A step only shows an "Open" button

@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { localDateOf, timeLocal, todayLocal, thisMonthLocal } from "@/lib/dates";
 import { notFound } from "next/navigation";
@@ -15,6 +17,12 @@ import { saveClassSettingsAction, sendClassroomLinkAction } from "@/lib/actions/
 import {
   archiveClassAction, assignInstructorAction, endEnrollmentAction, mergeSectionsAction, moveStudentAction, removeInstructorAction, saveClassAction,
 } from "../../actions";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Class details",
+  description: "Class settings, instructors and enrolled students.",
+  banner: "admin",
+});
 
 export default async function AdminClassPage({ params }: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin();

@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import { requireStudentStage } from "@/lib/auth";
 import { canEdit, editableSections, enrollmentState, nextStepPath, openCorrection } from "@/lib/enrollment";
@@ -9,7 +10,11 @@ import { EnrollNav } from "../enroll-nav";
 import { DeleteDoc, UploadForm } from "./doc-forms";
 import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Documents" };
+export const metadata: Metadata = pageMetadata({
+  title: "Documents",
+  description: "Upload your resume and the documents your application needs.",
+  banner: "student",
+});
 export const dynamic = "force-dynamic";
 
 const ACCEPT: Record<string, string> = { pdf: ".pdf,application/pdf", docx: ".docx", doc: ".doc", png: ".png,image/png", jpg: ".jpg,.jpeg,image/jpeg" };

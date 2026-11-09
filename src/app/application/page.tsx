@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import { cols } from "@/db";
 import { requireStudentStage } from "@/lib/auth";
@@ -10,7 +11,11 @@ import { startCheckoutAction } from "@/lib/actions/payment";
 import { formatUsd } from "@/lib/payment";
 import { requestOpen, stripeEnabled } from "@/lib/tuition";
 
-export const metadata: Metadata = { title: "Application status" };
+export const metadata: Metadata = pageMetadata({
+  title: "Application status",
+  description: "Where your Bright Horizon Institute application stands and what happens next.",
+  banner: "student",
+});
 export const dynamic = "force-dynamic";
 
 export default async function ApplicationStatusPage({ searchParams }: { searchParams: Promise<{ payment?: string }> }) {

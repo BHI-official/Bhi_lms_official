@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cols } from "@/db";
@@ -9,7 +10,11 @@ import { Alert } from "@/components/ui";
 import { attendanceToDo, usersById } from "@/lib/queries";
 import { Card, Empty, PageHeader, Stat, StatusBadge, fmtDate } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Home" };
+export const metadata: Metadata = pageMetadata({
+  title: "Admin home",
+  description: "Overview of new applications, instructors waiting for approval and classes that need attention.",
+  banner: "admin",
+});
 
 export default async function AdminDashboard() {
   await requireAdmin();

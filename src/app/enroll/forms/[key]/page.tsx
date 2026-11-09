@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { notFound, redirect } from "next/navigation";
 import { requireStudentStage } from "@/lib/auth";
 import { canEdit, editableSections, enrollmentState, nextStepPath, openCorrection } from "@/lib/enrollment";
@@ -10,6 +12,12 @@ import { EnrollNav } from "../../enroll-nav";
 import { FormStep } from "./form-step";
 import { PdfActions } from "@/components/pdf-actions";
 import { saveFormAction } from "../../actions";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Enrollment form",
+  description: "Fill in and sign an enrollment form.",
+  banner: "student",
+});
 
 export const dynamic = "force-dynamic";
 

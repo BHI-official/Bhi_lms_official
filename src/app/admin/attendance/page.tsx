@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import { todayLocal } from "@/lib/dates";
 import { AttendanceTabs } from "@/components/attendance-tabs";
 import type { Metadata } from "next";
@@ -7,7 +8,11 @@ import { requireAdmin } from "@/lib/auth";
 import { ATTENDANCE_LABEL, classOptions, searchAttendance } from "@/lib/queries";
 import { Empty, PageHeader, Table, Td, fmtDate } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Attendance" };
+export const metadata: Metadata = pageMetadata({
+  title: "Attendance and reports",
+  description: "Attendance sheets, live check-in and monthly progress reports across all classes.",
+  banner: "admin",
+});
 const isDate = (s?: string) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
 const isId = (s?: string) => !!s && /^[0-9a-f-]{36}$/.test(s);
 

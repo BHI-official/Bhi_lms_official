@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -7,7 +8,11 @@ import { settleCheckoutSession, stripe, stripeEnabled } from "@/lib/tuition";
 import { StudentShell } from "@/components/student-shell";
 import { Alert, PageHeader } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Payment" };
+export const metadata: Metadata = pageMetadata({
+  title: "Payment",
+  description: "Confirmation of your tuition payment.",
+  banner: "student",
+});
 export const dynamic = "force-dynamic";
 
 /**

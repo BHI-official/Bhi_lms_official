@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cols } from "@/db";
@@ -9,7 +10,11 @@ import { saveCourseAction } from "../actions";
 import { formatUsd } from "@/lib/payment";
 import { feesTotalCents } from "@/lib/forms/templates";
 
-export const metadata: Metadata = { title: "Courses and classes" };
+export const metadata: Metadata = pageMetadata({
+  title: "Courses and classes",
+  description: "Manage the BHI course list, fees, hours and the classes that run each course.",
+  banner: "admin",
+});
 const PROGRAM: Record<string, string> = { PRIVATE: "Private", EQISS: "Equus / One-Stop", DFS: "DFS", MIXED: "Mixed" };
 
 export default async function CoursesPage() {

@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cols } from "@/db";
@@ -8,6 +10,12 @@ import { AttendanceTable } from "@/components/attendance-table";
 import { ActionButton, AssignClassForm } from "@/components/action-widgets";
 import { Card, PageHeader, StatusBadge, fmtDate } from "@/components/ui";
 import { assignStudentAction, endEnrollmentAction, setAccountDisabledAction } from "../../actions";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Student details",
+  description: "A student profile with applications, enrollments, attendance and reports.",
+  banner: "admin",
+});
 
 export default async function StudentRecord({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();

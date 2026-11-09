@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cols } from "@/db";
@@ -8,7 +9,11 @@ import { thisMonthLocal } from "@/lib/dates";
 import { attendanceToDo, coursesById, usersById } from "@/lib/queries";
 import { Alert, Badge, Card, Empty, PageHeader, Table, Td, fmtDate } from "@/components/ui";
 
-export const metadata: Metadata = { title: "My courses" };
+export const metadata: Metadata = pageMetadata({
+  title: "My courses",
+  description: "The courses and classes you teach at Bright Horizon Institute.",
+  banner: "instructor",
+});
 export const dynamic = "force-dynamic";
 
 export default async function InstructorHome({ searchParams }: { searchParams: Promise<{ q?: string }> }) {

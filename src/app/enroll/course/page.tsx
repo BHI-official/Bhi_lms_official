@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { cols } from "@/db";
@@ -11,7 +12,11 @@ import { Alert, Card, Empty, PageHeader } from "@/components/ui";
 import { EnrollNav } from "../enroll-nav";
 import { CourseForm } from "./course-form";
 
-export const metadata: Metadata = { title: "Choose your course" };
+export const metadata: Metadata = pageMetadata({
+  title: "Choose your course",
+  description: "Pick the Bright Horizon Institute course you want to enroll in.",
+  banner: "student",
+});
 export const dynamic = "force-dynamic";
 
 export default async function CoursePage() {

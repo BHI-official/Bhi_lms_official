@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cols } from "@/db";
@@ -11,7 +12,11 @@ import { StudentShell } from "@/components/student-shell";
 import { PdfActions } from "@/components/pdf-actions";
 import { Card, PageHeader, StatusBadge, fmtDate } from "@/components/ui";
 
-export const metadata: Metadata = { title: "My dashboard" };
+export const metadata: Metadata = pageMetadata({
+  title: "My dashboard",
+  description: "Your classes, attendance and next steps at Bright Horizon Institute.",
+  banner: "student",
+});
 export const dynamic = "force-dynamic";
 
 export default async function StudentDashboard() {

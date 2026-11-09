@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -13,7 +14,11 @@ import { EnrollNav } from "../enroll-nav";
 import { SubmitForm } from "./submit-form";
 import { PdfActions } from "@/components/pdf-actions";
 
-export const metadata: Metadata = { title: "Review and submit" };
+export const metadata: Metadata = pageMetadata({
+  title: "Review and submit",
+  description: "Check your enrollment forms and documents, then submit your application.",
+  banner: "student",
+});
 export const dynamic = "force-dynamic";
 
 export default async function ReviewPage() {

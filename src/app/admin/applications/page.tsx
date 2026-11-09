@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { formatUsd } from "@/lib/payment";
@@ -8,7 +9,11 @@ import { CATEGORIES, CATEGORY_LABELS, COUNTIES, COUNTY_LABELS, describeEnrollmen
 import { coursesById, regexSafe, usersById } from "@/lib/queries";
 import { Empty, PageHeader, StatusBadge, Table, Td, fmtDate, cx } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Applications" };
+export const metadata: Metadata = pageMetadata({
+  title: "Applications",
+  description: "Review submitted student applications, request corrections and approve enrollments.",
+  banner: "admin",
+});
 
 const FILTERS: { key: string; label: string; statuses: ApplicationStatus[] | null; payment?: "TO_REQUEST" | "REQUESTED" }[] = [
   { key: "PENDING", label: "Pending review", statuses: ["SUBMITTED", "RESUBMITTED"] },
